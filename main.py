@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, List
@@ -14,6 +14,15 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 app = FastAPI()
 
+# Debugging middleware to log all requests
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    print(f"Request: {request.method} {request.url}")
+    print(f"Headers: {request.headers}")
+    response = await call_next(request)
+    print(f"Response status: {response.status_code}")
+    return response
+
 # CORS setup (allow frontend access)
 origins = [
     "https://innovbridge-n2j215hkm-neodiuzs-projects.vercel.app",
@@ -26,13 +35,14 @@ frontend_url = os.environ.get("FRONTEND_URL")
 if frontend_url and frontend_url not in origins:
     origins.append(frontend_url)
 
+# More permissive CORS setup to resolve persistent issues
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Allow all origins temporarily for testing
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
-    expose_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+    expose_headers=["*"],
     max_age=86400,  # 24 hours cache for preflight requests
 )
 
@@ -43,13 +53,30 @@ session_memory: Dict[str, List[Dict[str, str]]] = {}
 class ChatRequest(BaseModel):
     session_id: str
     message: str
+    
+@app.get("/")
+async def root(response: Response):
+    # Set CORS headers directly on the response
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return {"status": "API is running", "message": "Welcome to the coaching bot API!"}
 
 @app.options("/chat")
-async def options_chat():
-    return {"detail": "OK"}
+async def options_chat(response: Response):
+    # Custom CORS headers for OPTIONS preflight request
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS" 
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    return {}
 
 @app.post("/chat")
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, response: Response):
+    # Set CORS headers directly on the response
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
     session_id = req.session_id
     user_message = req.message
 
