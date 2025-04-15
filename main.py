@@ -15,11 +15,25 @@ client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 app = FastAPI()
 
 # CORS setup (allow frontend access)
+origins = [
+    "https://innovbridge-n2j215hkm-neodiuzs-projects.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+]
+
+# Get frontend URL from environment variables, add to origins if set
+frontend_url = os.environ.get("FRONTEND_URL")
+if frontend_url and frontend_url not in origins:
+    origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.environ.get("FRONTEND_URL", "*")],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    expose_headers=["Content-Type", "Authorization"],
+    max_age=86400,  # 24 hours cache for preflight requests
 )
 
 # In-memory session store
@@ -29,6 +43,10 @@ session_memory: Dict[str, List[Dict[str, str]]] = {}
 class ChatRequest(BaseModel):
     session_id: str
     message: str
+
+@app.options("/chat")
+async def options_chat():
+    return {"detail": "OK"}
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
