@@ -9,8 +9,12 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# Initialize OpenAI client - handle different versions
+try:
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+except TypeError:
+    # Fallback for different OpenAI versions
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"), base_url="https://api.openai.com/v1")
 
 app = FastAPI()
 
@@ -148,4 +152,7 @@ async def chat(req: ChatRequest, response: Response):
         return {"reply": reply}
 
     except Exception as e:
-        return {"reply": f"⚠️ Error: {str(e)}"}
+        print(f"Error during OpenAI API call: {str(e)}")
+        # Log the error but don't crash the server
+        error_message = "Sorry, I'm having trouble connecting to the coaching service. Please try again in a moment."
+        return {"reply": error_message}
