@@ -7,9 +7,34 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionId] = useState(() => crypto.randomUUID());
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const messagesEndRef = useRef(null);
   const chatBoxRef = useRef(null);
+  const textareaRef = useRef(null);
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  const isMobile = windowWidth < 768;
+
+  // Auto-resize the textarea as user types
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = Math.min(scrollHeight, 150) + 'px';
+    }
+  }, [input]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -23,6 +48,10 @@ export default function ChatPage() {
     setMessages(newMessages);
     setInput('');
     setLoading(true);
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
 
     try {
       const res = await fetch('/api/chat', {
@@ -58,11 +87,13 @@ export default function ChatPage() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '1rem 2rem',
+        padding: isMobile ? '0.75rem 1rem' : '1rem 2rem',
         backgroundColor: 'var(--card-bg)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
         position: 'relative',
-        zIndex: 10
+        zIndex: 10,
+        flexWrap: isMobile ? 'wrap' : 'nowrap',
+        gap: isMobile ? '0.5rem' : '0'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -70,7 +101,7 @@ export default function ChatPage() {
           gap: '0.75rem'
         }}>
           <span style={{ 
-            fontSize: '1.5rem', 
+            fontSize: isMobile ? '1.25rem' : '1.5rem', 
             fontWeight: '700',
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
             WebkitBackgroundClip: 'text',
@@ -83,11 +114,19 @@ export default function ChatPage() {
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '1.25rem'
+          gap: isMobile ? '0.75rem' : '1.25rem',
+          width: isMobile ? '100%' : 'auto',
+          justifyContent: isMobile ? 'space-between' : 'flex-end',
+          marginTop: isMobile ? '0.5rem' : '0'
         }}>
           <span style={{ 
             fontWeight: 500,
-            color: 'var(--muted)'
+            color: 'var(--muted)',
+            fontSize: isMobile ? '0.8rem' : '0.9rem',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            maxWidth: isMobile ? '150px' : 'none'
           }}>
             {user?.email}
           </span>
@@ -96,15 +135,19 @@ export default function ChatPage() {
             color: 'var(--danger)',
             border: '1px solid var(--danger)',
             borderRadius: '0.5rem',
-            padding: '0.5rem 1.25rem',
+            padding: isMobile ? '0.4rem 0.75rem' : '0.5rem 1.25rem',
             cursor: 'pointer',
             fontWeight: '600',
-            fontSize: '0.875rem',
-            transition: 'all 0.2s ease'
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
+            transition: 'all 0.2s ease',
+            minHeight: isMobile ? '44px' : 'auto',
+            WebkitTapHighlightColor: 'transparent'
           }} 
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--danger)';
-            e.currentTarget.style.color = 'white';
+            if (!isMobile) {
+              e.currentTarget.style.backgroundColor = 'var(--danger)';
+              e.currentTarget.style.color = 'white';
+            }
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
@@ -119,14 +162,15 @@ export default function ChatPage() {
       {/* Chat Container */}
       <div ref={chatBoxRef} style={{
         flexGrow: 1,
-        padding: '1.5rem',
+        padding: isMobile ? '1rem 0.75rem' : '1.5rem',
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
         gap: '1.25rem',
         maxWidth: '900px',
         width: '100%',
-        margin: '0 auto'
+        margin: '0 auto',
+        WebkitOverflowScrolling: 'touch'
       }}>
         {messages.length === 0 ? (
           <div style={{
@@ -137,23 +181,23 @@ export default function ChatPage() {
             height: '100%',
             opacity: '0.8',
             textAlign: 'center',
-            padding: '2rem'
+            padding: isMobile ? '1rem' : '2rem'
           }}>
             <div style={{ 
               background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
               borderRadius: '50%',
-              width: '80px',
-              height: '80px',
+              width: isMobile ? '60px' : '80px',
+              height: isMobile ? '60px' : '80px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '1.5rem',
-              fontSize: '2.5rem'
+              marginBottom: isMobile ? '1rem' : '1.5rem',
+              fontSize: isMobile ? '2rem' : '2.5rem'
             }}>
               🌱
             </div>
             <h3 style={{ 
-              fontSize: '1.5rem', 
+              fontSize: isMobile ? '1.25rem' : '1.5rem', 
               fontWeight: '600',
               marginBottom: '0.5rem',
               color: 'var(--fg)'
@@ -163,7 +207,9 @@ export default function ChatPage() {
             <p style={{
               color: 'var(--muted)',
               maxWidth: '450px',
-              lineHeight: '1.6'
+              lineHeight: '1.6',
+              fontSize: isMobile ? '0.9rem' : '1rem',
+              padding: isMobile ? '0 0.5rem' : '0'
             }}>
               Ask a question or share something you&apos;d like guidance on to begin your conversation
             </p>
@@ -198,11 +244,12 @@ export default function ChatPage() {
                 color: msg.sender === 'user' ? 'white' : 'var(--fg)',
                 padding: '1rem 1.25rem',
                 borderRadius: msg.sender === 'user' ? '1.25rem 1.25rem 0.25rem 1.25rem' : '1.25rem 1.25rem 1.25rem 0.25rem',
-                maxWidth: '65%',
+                maxWidth: isMobile ? '75%' : '65%',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
                 lineHeight: '1.5',
-                fontSize: '0.95rem',
-                border: msg.sender === 'bot' ? '1px solid rgba(0,0,0,0.05)' : 'none'
+                fontSize: isMobile ? '0.9rem' : '0.95rem',
+                border: msg.sender === 'bot' ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                wordBreak: 'break-word'
               }}>
                 {msg.text}
               </div>
@@ -262,7 +309,7 @@ export default function ChatPage() {
 
       {/* Message Input */}
       <div style={{
-        padding: '1.25rem 1.5rem',
+        padding: isMobile ? '0.75rem 0.75rem' : '1.25rem 1.5rem',
         borderTop: '1px solid rgba(0,0,0,0.05)',
         backgroundColor: 'var(--card-bg)',
         maxWidth: '900px',
@@ -276,6 +323,7 @@ export default function ChatPage() {
           position: 'relative'
         }}>
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -289,17 +337,18 @@ export default function ChatPage() {
               flexGrow: 1,
               border: '1px solid rgba(0,0,0,0.1)',
               borderRadius: '1rem',
-              padding: '0.875rem 1.25rem',
+              padding: isMobile ? '0.75rem 1rem' : '0.875rem 1.25rem',
               resize: 'none',
-              minHeight: '2.75rem',
+              minHeight: isMobile ? '44px' : '2.75rem',
               maxHeight: '150px',
               backgroundColor: 'var(--input-bg)',
               color: 'var(--fg)',
-              fontSize: '0.95rem',
+              fontSize: isMobile ? '16px' : '0.95rem',
               lineHeight: '1.5',
               outline: 'none',
               boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-              transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+              transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+              WebkitAppearance: 'none'
             }}
             onFocus={(e) => {
               e.target.style.borderColor = 'var(--primary)';
@@ -317,20 +366,24 @@ export default function ChatPage() {
               color: 'white',
               border: 'none',
               borderRadius: '1rem',
-              padding: '0.75rem 1.5rem',
+              padding: isMobile ? '0.75rem 1rem' : '0.75rem 1.5rem',
               cursor: 'pointer',
               fontWeight: 'bold',
-              fontSize: '0.95rem',
-              height: '2.75rem',
+              fontSize: isMobile ? '0.85rem' : '0.95rem',
+              height: isMobile ? '44px' : '2.75rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              WebkitTapHighlightColor: 'transparent',
+              minWidth: isMobile ? '44px' : '80px'
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+              if (!isMobile) {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+              }
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';

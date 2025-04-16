@@ -9,14 +9,29 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const router = useRouter();
   const { signIn, user } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
       router.push('/chat');
     }
   }, [user, router]);
+
+  const isMobile = windowWidth < 768;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,15 +56,15 @@ export default function Login() {
       backgroundColor: 'var(--bg)',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '2rem'
+      padding: isMobile ? '1rem' : '2rem'
     }}>
       <div style={{
         width: '100%',
-        maxWidth: '420px',
+        maxWidth: isMobile ? '100%' : '420px',
         backgroundColor: 'var(--card-bg)',
         borderRadius: '1.5rem',
         boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-        padding: '2.5rem',
+        padding: isMobile ? '1.5rem' : '2.5rem',
         transition: 'transform 0.3s ease',
         animation: 'fadeIn 0.5s ease forwards'
       }}>
@@ -57,7 +72,7 @@ export default function Login() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          marginBottom: '2rem'
+          marginBottom: isMobile ? '1.5rem' : '2rem'
         }}>
           <div style={{ 
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
@@ -73,7 +88,7 @@ export default function Login() {
             🌱
           </div>
           <h1 style={{
-            fontSize: '1.75rem',
+            fontSize: isMobile ? '1.5rem' : '1.75rem',
             fontWeight: '700',
             marginBottom: '0.5rem',
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
@@ -123,6 +138,7 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
+              autoComplete="email"
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
@@ -130,9 +146,10 @@ export default function Login() {
                 border: '1px solid rgba(0,0,0,0.1)',
                 backgroundColor: 'var(--input-bg)',
                 color: 'var(--fg)',
-                fontSize: '0.95rem',
+                fontSize: isMobile ? '16px' : '0.95rem',
                 outline: 'none',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                minHeight: isMobile ? '44px' : 'auto'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--primary)';
@@ -148,13 +165,15 @@ export default function Login() {
           <div style={{ marginBottom: '1.5rem' }}>
             <div style={{
               display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
               justifyContent: 'space-between',
               marginBottom: '0.5rem'
             }}>
               <label style={{ 
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: 'var(--muted)'
+                color: 'var(--muted)',
+                marginBottom: isMobile ? '0.25rem' : '0'
               }}>
                 Password
               </label>
@@ -162,7 +181,10 @@ export default function Login() {
                 fontSize: '0.75rem',
                 color: 'var(--primary)',
                 fontWeight: '500',
-                textDecoration: 'none'
+                textDecoration: 'none',
+                display: 'inline-block',
+                padding: isMobile ? '0.25rem' : '0',
+                margin: isMobile ? '-0.25rem' : '0'
               }}>
                 Forgot password?
               </a>
@@ -173,6 +195,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
+              autoComplete="current-password"
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
@@ -180,9 +203,10 @@ export default function Login() {
                 border: '1px solid rgba(0,0,0,0.1)',
                 backgroundColor: 'var(--input-bg)',
                 color: 'var(--fg)',
-                fontSize: '0.95rem',
+                fontSize: isMobile ? '16px' : '0.95rem',
                 outline: 'none',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                minHeight: isMobile ? '44px' : 'auto'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--primary)';
@@ -211,10 +235,16 @@ export default function Login() {
               opacity: loading ? '0.8' : '1',
               boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)',
               transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              marginBottom: '1.5rem'
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              minHeight: isMobile ? '44px' : 'auto',
+              WebkitTapHighlightColor: 'transparent'
             }}
             onMouseOver={(e) => {
-              if (!loading) {
+              if (!loading && !isMobile) {
                 e.currentTarget.style.transform = 'translateY(-1px)';
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
               }
@@ -224,7 +254,19 @@ export default function Login() {
               e.currentTarget.style.boxShadow = '0 2px 6px rgba(59, 130, 246, 0.3)';
             }}
           >
-            {loading ? 'Signing in...' : 'Sign in to account'}
+            {loading ? (
+              <>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{
+                  animation: 'spin 1s linear infinite'
+                }}>
+                  <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" 
+                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Signing in...
+              </>
+            ) : (
+              'Sign in to account'
+            )}
           </button>
         </form>
         
@@ -237,7 +279,10 @@ export default function Login() {
           <Link href="/register" style={{
             color: 'var(--primary)',
             fontWeight: '500',
-            textDecoration: 'none'
+            textDecoration: 'none',
+            display: 'inline-block',
+            padding: isMobile ? '0.25rem' : '0',
+            margin: isMobile ? '-0.25rem' : '0'
           }}>
             Create account
           </Link>

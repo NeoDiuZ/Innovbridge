@@ -1,11 +1,26 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  const isMobile = windowWidth < 768;
 
   useEffect(() => {
     if (user) {
@@ -16,12 +31,32 @@ export default function Home() {
   }, [user, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-blue-50">
-      <div className="text-center">
-        <div className="text-3xl font-bold mb-4 text-green-700 animate-pulse">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(to bottom right, #f3f4f6, #e0f2fe)'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        padding: isMobile ? '1rem' : '2rem'
+      }}>
+        <div style={{
+          fontSize: isMobile ? '1.5rem' : '1.875rem',
+          fontWeight: 'bold',
+          marginBottom: '1rem',
+          color: '#047857',
+          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+        }}>
           🌱 Coaching Bot
         </div>
-        <p className="text-gray-600">Redirecting you to the right place...</p>
+        <p style={{
+          color: '#4b5563',
+          fontSize: isMobile ? '0.9rem' : '1rem'
+        }}>
+          Redirecting you to the right place...
+        </p>
       </div>
     </div>
   );

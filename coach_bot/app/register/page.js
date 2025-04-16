@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
@@ -13,8 +13,23 @@ export default function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const router = useRouter();
   const { signUp } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  const isMobile = windowWidth < 768;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,15 +69,15 @@ export default function Register() {
       backgroundColor: 'var(--bg)',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '2rem'
+      padding: isMobile ? '1rem' : '2rem'
     }}>
       <div style={{
         width: '100%',
-        maxWidth: '500px',
+        maxWidth: isMobile ? '100%' : '500px',
         backgroundColor: 'var(--card-bg)',
         borderRadius: '1.5rem',
         boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-        padding: '2.5rem',
+        padding: isMobile ? '1.5rem' : '2.5rem',
         transition: 'transform 0.3s ease',
         animation: 'fadeIn 0.5s ease forwards'
       }}>
@@ -70,7 +85,7 @@ export default function Register() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          marginBottom: '2rem'
+          marginBottom: isMobile ? '1.5rem' : '2rem'
         }}>
           <div style={{ 
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
@@ -86,7 +101,7 @@ export default function Register() {
             🌱
           </div>
           <h1 style={{
-            fontSize: '1.75rem',
+            fontSize: isMobile ? '1.5rem' : '1.75rem',
             fontWeight: '700',
             marginBottom: '0.5rem',
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
@@ -136,7 +151,7 @@ export default function Register() {
         <form onSubmit={handleSubmit}>
           <div style={{ 
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr', 
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
             gap: '1rem',
             marginBottom: '1rem'
           }}>
@@ -156,6 +171,7 @@ export default function Register() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="johndoe"
+                autoComplete="username"
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
@@ -163,9 +179,10 @@ export default function Register() {
                   border: '1px solid rgba(0,0,0,0.1)',
                   backgroundColor: 'var(--input-bg)',
                   color: 'var(--fg)',
-                  fontSize: '0.95rem',
+                  fontSize: isMobile ? '16px' : '0.95rem',
                   outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  minHeight: isMobile ? '44px' : 'auto'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = 'var(--primary)';
@@ -194,6 +211,7 @@ export default function Register() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
                 placeholder="+1 (555) 123-4567"
+                autoComplete="tel"
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
@@ -201,9 +219,10 @@ export default function Register() {
                   border: '1px solid rgba(0,0,0,0.1)',
                   backgroundColor: 'var(--input-bg)',
                   color: 'var(--fg)',
-                  fontSize: '0.95rem',
+                  fontSize: isMobile ? '16px' : '0.95rem',
                   outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  minHeight: isMobile ? '44px' : 'auto'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = 'var(--primary)';
@@ -233,6 +252,7 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
+              autoComplete="email"
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
@@ -240,9 +260,10 @@ export default function Register() {
                 border: '1px solid rgba(0,0,0,0.1)',
                 backgroundColor: 'var(--input-bg)',
                 color: 'var(--fg)',
-                fontSize: '0.95rem',
+                fontSize: isMobile ? '16px' : '0.95rem',
                 outline: 'none',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                minHeight: isMobile ? '44px' : 'auto'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--primary)';
@@ -257,7 +278,7 @@ export default function Register() {
           
           <div style={{ 
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr', 
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
             gap: '1rem',
             marginBottom: '1.5rem'
           }}>
@@ -277,6 +298,7 @@ export default function Register() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
+                autoComplete="new-password"
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
@@ -284,9 +306,10 @@ export default function Register() {
                   border: '1px solid rgba(0,0,0,0.1)',
                   backgroundColor: 'var(--input-bg)',
                   color: 'var(--fg)',
-                  fontSize: '0.95rem',
+                  fontSize: isMobile ? '16px' : '0.95rem',
                   outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  minHeight: isMobile ? '44px' : 'auto'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = 'var(--primary)';
@@ -315,6 +338,7 @@ export default function Register() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 placeholder="••••••••"
+                autoComplete="new-password"
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
@@ -322,9 +346,10 @@ export default function Register() {
                   border: '1px solid rgba(0,0,0,0.1)',
                   backgroundColor: 'var(--input-bg)',
                   color: 'var(--fg)',
-                  fontSize: '0.95rem',
+                  fontSize: isMobile ? '16px' : '0.95rem',
                   outline: 'none',
-                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                  minHeight: isMobile ? '44px' : 'auto'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = 'var(--primary)';
@@ -358,10 +383,12 @@ export default function Register() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              minHeight: isMobile ? '44px' : 'auto',
+              WebkitTapHighlightColor: 'transparent'
             }}
             onMouseOver={(e) => {
-              if (!loading) {
+              if (!loading && !isMobile) {
                 e.currentTarget.style.transform = 'translateY(-1px)';
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
               }
@@ -396,7 +423,10 @@ export default function Register() {
           <Link href="/login" style={{
             color: 'var(--primary)',
             fontWeight: '500',
-            textDecoration: 'none'
+            textDecoration: 'none',
+            display: 'inline-block',
+            padding: isMobile ? '0.25rem' : '0',
+            margin: isMobile ? '-0.25rem' : '0'
           }}>
             Sign in
           </Link>

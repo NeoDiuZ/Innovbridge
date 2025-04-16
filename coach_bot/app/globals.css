@@ -24,12 +24,81 @@
   }
 }
 
+/* Mobile-specific variables */
+@media (max-width: 767px) {
+  :root {
+    --card-padding: 1rem;
+    --input-padding: 0.6rem;
+    --font-size-small: 0.85rem;
+    --font-size-normal: 0.95rem;
+    --font-size-large: 1.25rem;
+    --spacing-small: 0.75rem;
+    --spacing-normal: 1rem;
+    --button-height: 2.75rem;
+    --touch-target-min: 44px;  /* Minimum size for touch targets */
+  }
+}
+
+/* Desktop-specific variables */
+@media (min-width: 768px) {
+  :root {
+    --card-padding: 2rem;
+    --input-padding: 0.75rem;
+    --font-size-small: 0.9rem;
+    --font-size-normal: 1rem;
+    --font-size-large: 1.5rem;
+    --spacing-small: 1rem;
+    --spacing-normal: 1.5rem;
+    --button-height: 2.75rem;
+  }
+}
+
 body {
   margin: 0;
   font-family: var(--font);
   background-color: var(--bg);
   color: var(--fg);
   line-height: 1.6;
+  -webkit-text-size-adjust: 100%;  /* Prevent font scaling in landscape */
+  text-size-adjust: 100%;
+}
+
+html, body, input, button, textarea, select {
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent overflow on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Better focus states for accessibility */
+a:focus, button:focus, input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 767px) {
+  button, 
+  [role="button"],
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"],
+  a.button,
+  .button {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+  
+  input, 
+  select, 
+  textarea {
+    font-size: 16px !important; /* Prevent zoom on iOS */
+  }
 }
 
 .container {
@@ -37,7 +106,7 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: var(--spacing-normal) var(--spacing-small);
   gap: 1rem;
   max-width: 700px;
   margin: 0 auto;
@@ -45,7 +114,7 @@ body {
 
 .card {
   background-color: var(--card-bg);
-  padding: 2rem;
+  padding: var(--card-padding);
   border-radius: 1rem;
   width: 100%;
   max-width: 420px;
@@ -56,37 +125,37 @@ body {
   text-align: center;
   color: var(--primary);
   margin-bottom: 1rem;
-  font-size: 1.5rem;
+  font-size: var(--font-size-large);
   font-weight: 700;
 }
 
 .title {
   text-align: center;
   margin-bottom: 1rem;
-  font-size: 1.25rem;
+  font-size: var(--font-size-normal);
   font-weight: 600;
 }
 
 .input {
   display: block;
   width: 100%;
-  padding: 0.75rem;
+  padding: var(--input-padding);
   margin-bottom: 1rem;
   background-color: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 0.5rem;
   color: var(--fg);
-  font-size: 1rem;
+  font-size: var(--font-size-normal);
 }
 
 .button {
   width: 100%;
-  padding: 0.75rem;
+  padding: var(--input-padding);
   font-weight: bold;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: var(--font-size-normal);
   transition: background-color 0.3s ease;
 }
 
@@ -115,7 +184,7 @@ body {
 }
 
 .muted {
-  font-size: 0.875rem;
+  font-size: var(--font-size-small);
   color: var(--muted);
   text-align: center;
 }
@@ -127,19 +196,27 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  padding: var(--spacing-small);
+  gap: 0.5rem;
 }
 
+@media (max-width: 767px) {
+  .chat-header {
+    padding: 0.5rem;
+  }
+}
 
 .chat-box {
   background-color: var(--card-bg);
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: var(--spacing-small);
   max-height: 60vh;
   overflow-y: auto;
   margin-bottom: 1rem;
   width: 100%;
+  /* Improve scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
 }
-
 
 .chat-message {
   margin-bottom: 0.75rem;
@@ -167,16 +244,25 @@ body {
   height: auto;          /* Maintain natural height */
 }
 
+@media (max-width: 767px) {
+  .chat-input button {
+    padding: 0.5rem 0.75rem;
+    min-width: 60px;
+    font-size: var(--font-size-small);
+    min-height: var(--touch-target-min);
+  }
+}
+
 .chat-input textarea {
   flex: 1;               /* Take remaining space */
   min-height: 3.5rem;
-  padding: 0.75rem;
+  padding: var(--input-padding);
   border-radius: 0.5rem;
   border: 1px solid var(--input-border);
   background-color: var(--input-bg);
   color: var(--fg);
   resize: none;
-  font-size: 1rem;
+  font-size: var(--font-size-normal);
   line-height: 1.4;
   /* Remove display: inline-block if it exists */
 }
@@ -190,6 +276,15 @@ body {
   margin-bottom: 0.5rem;
   display: inline-block;
   max-width: 80%;
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .chat-message.user {
+    max-width: 85%;
+    padding: 0.6rem 0.75rem;
+    font-size: var(--font-size-small);
+  }
 }
 
 .chat-message.bot {
@@ -201,6 +296,15 @@ body {
   margin-bottom: 0.5rem;
   display: inline-block;
   max-width: 80%;
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .chat-message.bot {
+    max-width: 85%;
+    padding: 0.6rem 0.75rem;
+    font-size: var(--font-size-small);
+  }
 }
 
 /* Typing animation */
@@ -224,4 +328,36 @@ body {
   40% { width: 1em; }
   60% { width: 1.5em; }
   100% { width: 1.5em; }
+}
+
+/* Animation for fading in elements */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation for spinning elements */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Animation for pulsing elements */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Fix iOS Safari 100vh issue */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Improve tap highlight on mobile */
+@media (max-width: 767px) {
+  a, button, input[type="button"], input[type="submit"], input[type="reset"] {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+  }
 }
