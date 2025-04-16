@@ -233,7 +233,7 @@ export default function Login() {
           color: 'var(--muted)',
           textAlign: 'center'
         }}>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" style={{
             color: 'var(--primary)',
             fontWeight: '500',

@@ -165,7 +165,7 @@ export default function ChatPage() {
               maxWidth: '450px',
               lineHeight: '1.6'
             }}>
-              Ask a question or share something you'd like guidance on to begin your conversation
+              Ask a question or share something you&apos;d like guidance on to begin your conversation
             </p>
           </div>
         ) : (
