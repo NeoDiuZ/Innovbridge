@@ -10,119 +10,149 @@ export default function ChatPage() {
   const messagesEndRef = useRef(null);
   const { user, signOut } = useAuth();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-  
     const newMessages = [...messages, { sender: 'user', text: input }];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
-  
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input, session_id: sessionId }),
       });
-  
-      if (!res.ok) throw new Error(`API error: ${res.status}`);
-  
+
       const data = await res.json();
       const reply = data.reply;
       setMessages((msgs) => [...msgs, { sender: 'bot', text: reply }]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      setMessages((msgs) => [
-        ...msgs,
-        {
-          sender: 'bot',
-          text: '❌ Error: Could not connect to coaching service. Please try again later.',
-        },
-      ]);
+    } catch (err) {
+      setMessages((msgs) => [...msgs, {
+        sender: 'bot',
+        text: '❌ Error: Could not connect to the coaching service.',
+      }]);
     } finally {
       setLoading(false);
-    }
-  };  
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 flex flex-col items-center justify-start p-6">
-      <div className="w-full max-w-2xl flex justify-between items-center mb-4">
-        <div className="text-3xl font-bold text-green-700 animate-pulse">🌱 Coaching Bot</div>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-600">
-            Welcome, {user?.email}
-          </span>
-          <button 
-            onClick={signOut}
-            className="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600 transition"
-          >
-            Logout
-          </button>
-        </div>
+    <div style={pageStyle}>
+      <div style={headerStyle}>
+        <h2 style={logoStyle}>🌱 Coaching Bot</h2>
+        <span>Welcome, {user?.email}</span>
+        <button onClick={signOut} style={logoutBtn}>Logout</button>
       </div>
 
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 space-y-4 overflow-y-auto max-h-[75vh]">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            <p>Start chatting with your coach!</p>
-          </div>
-        )}
-        
+      <div style={chatBox}>
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`p-3 rounded-xl whitespace-pre-line transition-all duration-300 ${
-              msg.sender === 'user'
-                ? 'bg-blue-100 text-right ml-auto w-fit'
-                : msg.text.startsWith('📝 Summary:')
-                ? 'bg-yellow-100 text-gray-800'
-                : msg.text.startsWith('🔁 Feedback:')
-                ? 'bg-purple-100 text-gray-800'
-                : 'bg-green-100 text-left mr-auto w-fit'
-            }`}
-          >
+          <div key={idx} style={msg.sender === 'user' ? userBubble : botBubble}>
             <strong>{msg.sender === 'user' ? 'You' : 'Coach'}:</strong> {msg.text}
           </div>
         ))}
-        {loading && (
-          <div className="bg-green-100 text-left p-3 rounded-xl w-fit animate-pulse">
-            <strong>Coach:</strong> Typing...
-          </div>
-        )}
+        {loading && <div style={botBubble}>Coach: Typing...</div>}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex w-full max-w-2xl mt-4">
+      <div style={inputRow}>
         <textarea
-          rows="2"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="flex-grow p-3 border border-gray-300 rounded-l-xl focus:outline-none resize-none"
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
           placeholder="Type your message..."
+          style={inputBox}
         />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-6 rounded-r-xl hover:bg-blue-600 transition"
-        >
-          Send
-        </button>
+        <button onClick={sendMessage} style={sendBtn}>Send</button>
       </div>
     </div>
   );
 }
+
+const pageStyle = {
+  minHeight: '100vh',
+  backgroundColor: 'var(--color-bg)',
+  color: 'var(--color-text)',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '2rem',
+};
+
+const headerStyle = {
+  width: '100%',
+  maxWidth: '700px',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '1rem',
+};
+
+const logoStyle = { color: 'var(--color-secondary)', fontSize: '1.5rem' };
+
+const chatBox = {
+  backgroundColor: 'var(--color-card)',
+  padding: '1rem',
+  borderRadius: '8px',
+  width: '100%',
+  maxWidth: '700px',
+  flexGrow: 1,
+  overflowY: 'auto',
+  maxHeight: '60vh',
+  marginBottom: '1rem',
+};
+
+const userBubble = {
+  backgroundColor: 'var(--color-primary)',
+  color: '#fff',
+  borderRadius: '12px',
+  padding: '0.75rem',
+  marginBottom: '0.5rem',
+  textAlign: 'right',
+};
+
+const botBubble = {
+  backgroundColor: 'var(--color-input-bg)',
+  borderRadius: '12px',
+  padding: '0.75rem',
+  marginBottom: '0.5rem',
+  textAlign: 'left',
+};
+
+const inputRow = {
+  display: 'flex',
+  width: '100%',
+  maxWidth: '700px',
+};
+
+const inputBox = {
+  flexGrow: 1,
+  padding: '0.75rem',
+  borderRadius: '8px 0 0 8px',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-input-bg)',
+  color: 'var(--color-text)',
+  resize: 'none',
+};
+
+const sendBtn = {
+  padding: '0.75rem 1.25rem',
+  backgroundColor: 'var(--color-primary)',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '0 8px 8px 0',
+  cursor: 'pointer',
+};
+
+const logoutBtn = {
+  backgroundColor: 'var(--color-error)',
+  color: '#fff',
+  padding: '0.5rem 1rem',
+  border: 'none',
+  borderRadius: '6px',
+  cursor: 'pointer',
+};
