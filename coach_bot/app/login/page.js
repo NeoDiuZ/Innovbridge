@@ -56,15 +56,15 @@ export default function Login() {
       backgroundColor: 'var(--bg)',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: isMobile ? '1.5rem 1rem' : '2rem'
+      padding: isMobile ? '0.75rem' : '2rem'
     }}>
       <div style={{
         width: '100%',
-        maxWidth: isMobile ? '100%' : '420px',
+        maxWidth: isMobile ? '90%' : '420px',
         backgroundColor: 'var(--card-bg)',
-        borderRadius: '1.5rem',
+        borderRadius: '1.25rem',
         boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-        padding: isMobile ? '2rem 1.5rem' : '2.5rem',
+        padding: isMobile ? '1.5rem 1.25rem' : '2.5rem',
         transition: 'transform 0.3s ease',
         animation: 'fadeIn 0.5s ease forwards'
       }}>
@@ -72,25 +72,25 @@ export default function Login() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          marginBottom: isMobile ? '2rem' : '2rem'
+          marginBottom: isMobile ? '1.5rem' : '2rem'
         }}>
           <div style={{ 
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
             borderRadius: '50%',
-            width: isMobile ? '70px' : '60px',
-            height: isMobile ? '70px' : '60px',
+            width: isMobile ? '64px' : '60px',
+            height: isMobile ? '64px' : '60px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '1.5rem',
-            fontSize: isMobile ? '2.25rem' : '2rem'
+            marginBottom: isMobile ? '1.25rem' : '1.5rem',
+            fontSize: isMobile ? '2rem' : '2rem'
           }}>
             🌱
           </div>
           <h1 style={{
-            fontSize: isMobile ? '1.75rem' : '1.75rem',
+            fontSize: isMobile ? '1.6rem' : '1.75rem',
             fontWeight: '700',
-            marginBottom: '0.75rem',
+            marginBottom: '0.5rem',
             background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
@@ -98,7 +98,7 @@ export default function Login() {
             Coaching Bot
           </h1>
           <h2 style={{
-            fontSize: isMobile ? '1.2rem' : '1.1rem',
+            fontSize: isMobile ? '1.1rem' : '1.1rem',
             fontWeight: '500',
             color: 'var(--muted)',
             marginBottom: '0.5rem'
@@ -112,7 +112,7 @@ export default function Login() {
             padding: '0.75rem 1rem',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             borderRadius: '0.5rem',
-            marginBottom: '1.5rem',
+            marginBottom: '1.25rem',
             color: 'var(--danger)',
             fontSize: '0.875rem',
             fontWeight: '500'
@@ -122,11 +122,11 @@ export default function Login() {
         )}
         
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ 
               display: 'block', 
-              marginBottom: '0.75rem', 
-              fontSize: isMobile ? '1rem' : '0.875rem',
+              marginBottom: '0.5rem', 
+              fontSize: isMobile ? '0.95rem' : '0.875rem',
               fontWeight: '500',
               color: 'var(--muted)'
             }}>
@@ -141,7 +141,7 @@ export default function Login() {
               autoComplete="email"
               style={{
                 width: '100%',
-                padding: isMobile ? '0.875rem 1.25rem' : '0.75rem 1rem',
+                padding: isMobile ? '0.75rem 1rem' : '0.75rem 1rem',
                 borderRadius: '0.75rem',
                 border: '1px solid rgba(0,0,0,0.1)',
                 backgroundColor: 'var(--input-bg)',
@@ -149,7 +149,7 @@ export default function Login() {
                 fontSize: isMobile ? '16px' : '0.95rem',
                 outline: 'none',
                 transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                minHeight: isMobile ? '52px' : '44px'
+                minHeight: isMobile ? '48px' : '44px'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--primary)';
@@ -162,16 +162,16 @@ export default function Login() {
             />
           </div>
           
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
             <div style={{
               display: 'flex',
               flexDirection: isMobile ? 'row' : 'row',
               justifyContent: 'space-between',
-              marginBottom: '0.75rem',
+              marginBottom: '0.5rem',
               alignItems: 'center'
             }}>
               <label style={{ 
-                fontSize: isMobile ? '1rem' : '0.875rem',
+                fontSize: isMobile ? '0.95rem' : '0.875rem',
                 fontWeight: '500',
                 color: 'var(--muted)',
                 marginBottom: '0'
@@ -199,7 +199,7 @@ export default function Login() {
               autoComplete="current-password"
               style={{
                 width: '100%',
-                padding: isMobile ? '0.875rem 1.25rem' : '0.75rem 1rem',
+                padding: isMobile ? '0.75rem 1rem' : '0.75rem 1rem',
                 borderRadius: '0.75rem',
                 border: '1px solid rgba(0,0,0,0.1)',
                 backgroundColor: 'var(--input-bg)',
@@ -207,7 +207,7 @@ export default function Login() {
                 fontSize: isMobile ? '16px' : '0.95rem',
                 outline: 'none',
                 transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                minHeight: isMobile ? '52px' : '44px'
+                minHeight: isMobile ? '48px' : '44px'
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--primary)';
@@ -225,23 +225,23 @@ export default function Login() {
             disabled={loading}
             style={{
               width: '100%',
-              padding: isMobile ? '1rem' : '0.8rem',
+              padding: isMobile ? '0.75rem' : '0.8rem',
               borderRadius: '0.75rem',
               border: 'none',
               background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
               color: 'white',
-              fontSize: isMobile ? '1rem' : '0.95rem',
+              fontSize: isMobile ? '0.95rem' : '0.95rem',
               fontWeight: '600',
               cursor: loading ? 'default' : 'pointer',
               opacity: loading ? '0.8' : '1',
               boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)',
               transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              marginBottom: '2rem',
+              marginBottom: '1.5rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
-              minHeight: isMobile ? '56px' : '44px',
+              minHeight: isMobile ? '50px' : '44px',
               WebkitTapHighlightColor: 'transparent'
             }}
             onMouseOver={(e) => {
@@ -272,7 +272,7 @@ export default function Login() {
         </form>
         
         <p style={{
-          fontSize: isMobile ? '1rem' : '0.875rem',
+          fontSize: isMobile ? '0.95rem' : '0.875rem',
           color: 'var(--muted)',
           textAlign: 'center'
         }}>
