@@ -9,12 +9,13 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Initialize OpenAI client - handle different versions
-try:
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-except TypeError:
-    # Fallback for different OpenAI versions
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"), base_url="https://api.openai.com/v1")
+# Initialize OpenAI client for v0.27.x
+from openai import OpenAI
+
+from openai import OpenAI
+
+client = OpenAI()  # no arguments needed IF you set OPENAI_API_KEY via env
+
 
 app = FastAPI()
 

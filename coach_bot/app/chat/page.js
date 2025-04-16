@@ -20,40 +20,37 @@ export default function ChatPage() {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-
+  
     const newMessages = [...messages, { sender: 'user', text: input }];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
-
+  
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+      const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': window.location.origin
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input, session_id: sessionId }),
-        mode: 'cors',
-        credentials: 'include',
       });
-      
-      if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
-      }
-      
+  
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+  
       const data = await res.json();
       const reply = data.reply;
       setMessages((msgs) => [...msgs, { sender: 'bot', text: reply }]);
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages((msgs) => [...msgs, { sender: 'bot', text: `Error: Could not connect to coaching service. Please try again later.` }]);
+      setMessages((msgs) => [
+        ...msgs,
+        {
+          sender: 'bot',
+          text: '❌ Error: Could not connect to coaching service. Please try again later.',
+        },
+      ]);
     } finally {
       setLoading(false);
     }
-    // The function ends here since we handle everything in the try/catch block above
-  };
+  };  
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
