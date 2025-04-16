@@ -47,106 +47,359 @@ export default function Register() {
   };
 
   return (
-    <div className="container">
-      <div className="card">
-        <h1 className="logo">
-          <span className="logo-icon">🌱</span>Coaching Assistant
-        </h1>
-        <h2 className="title">Create Your Account</h2>
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      width: '100%',
+      backgroundColor: 'var(--bg)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '500px',
+        backgroundColor: 'var(--card-bg)',
+        borderRadius: '1.5rem',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+        padding: '2.5rem',
+        transition: 'transform 0.3s ease',
+        animation: 'fadeIn 0.5s ease forwards'
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginBottom: '2rem'
+        }}>
+          <div style={{ 
+            background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
+            borderRadius: '50%',
+            width: '60px',
+            height: '60px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '1.25rem',
+            fontSize: '2rem'
+          }}>
+            🌱
+          </div>
+          <h1 style={{
+            fontSize: '1.75rem',
+            fontWeight: '700',
+            marginBottom: '0.5rem',
+            background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Coaching Bot
+          </h1>
+          <h2 style={{
+            fontSize: '1.1rem',
+            fontWeight: '500',
+            color: 'var(--muted)',
+            marginBottom: '0.5rem'
+          }}>
+            Create your account
+          </h2>
+        </div>
+
+        {error && (
+          <div style={{
+            padding: '0.75rem 1rem',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: '0.5rem',
+            marginBottom: '1.5rem',
+            color: 'var(--danger)',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}>
+            {error}
+          </div>
+        )}
         
-        {error && <div className="error">{error}</div>}
-        {success && <div className="success">{success}</div>}
+        {success && (
+          <div style={{
+            padding: '0.75rem 1rem',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderRadius: '0.5rem',
+            marginBottom: '1.5rem',
+            color: 'var(--success)',
+            fontSize: '0.875rem',
+            fontWeight: '500'
+          }}>
+            {success}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label htmlFor="username">Username</label>
-            <input 
-              id="username"
-              type="text" 
-              className="input" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              placeholder="johndoe"
-              required 
-            />
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr', 
+            gap: '1rem',
+            marginBottom: '1rem'
+          }}>
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: 'var(--muted)'
+              }}>
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                placeholder="johndoe"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--fg)',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+            
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: 'var(--muted)'
+              }}>
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                placeholder="+1 (555) 123-4567"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--fg)',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
           </div>
           
-          <div className="input-group">
-            <label htmlFor="email">Email Address</label>
-            <input 
-              id="email"
-              type="email" 
-              className="input" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '0.5rem', 
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: 'var(--muted)'
+            }}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
               placeholder="you@example.com"
-              required 
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(0,0,0,0.1)',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--fg)',
+                fontSize: '0.95rem',
+                outline: 'none',
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--primary)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
           
-          <div className="input-group">
-            <label htmlFor="phone">Phone Number</label>
-            <input 
-              id="phone"
-              type="tel" 
-              className="input" 
-              value={phoneNumber} 
-              onChange={(e) => setPhoneNumber(e.target.value)} 
-              placeholder="+1 (555) 123-4567"
-              required 
-            />
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr', 
+            gap: '1rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: 'var(--muted)'
+              }}>
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--fg)',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+            
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: 'var(--muted)'
+              }}>
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--fg)',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--primary)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(0,0,0,0.1)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
           </div>
           
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input 
-              id="password"
-              type="password" 
-              className="input" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              placeholder="••••••••"
-              required 
-            />
-          </div>
-          
-          <div className="input-group">
-            <label htmlFor="confirm-password">Confirm Password</label>
-            <input 
-              id="confirm-password"
-              type="password" 
-              className="input" 
-              value={confirmPassword} 
-              onChange={(e) => setConfirmPassword(e.target.value)} 
-              placeholder="••••••••"
-              required 
-            />
-          </div>
-          
-          <button type="submit" className="button primary" disabled={loading}>
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '0.8rem',
+              borderRadius: '0.5rem',
+              border: 'none',
+              background: 'linear-gradient(135deg, var(--primary) 0%, #4299e1 100%)',
+              color: 'white',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: loading ? 'default' : 'pointer',
+              opacity: loading ? '0.8' : '1',
+              boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+            onMouseOver={(e) => {
+              if (!loading) {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+              }
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(59, 130, 246, 0.3)';
+            }}
+          >
             {loading ? (
               <>
-                <svg className="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{
+                  animation: 'spin 1s linear infinite'
+                }}>
                   <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" 
-                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                    style={{animation: 'spin 1s linear infinite'}}/>
+                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 Creating Account...
               </>
             ) : (
-              <>
-                <svg className="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Create Account
-              </>
+              'Create Account'
             )}
           </button>
         </form>
         
-        <p className="muted">
-          Already have an account? <Link href="/login">Sign in</Link>
+        <p style={{
+          fontSize: '0.875rem',
+          color: 'var(--muted)',
+          textAlign: 'center'
+        }}>
+          Already have an account?{' '}
+          <Link href="/login" style={{
+            color: 'var(--primary)',
+            fontWeight: '500',
+            textDecoration: 'none'
+          }}>
+            Sign in
+          </Link>
         </p>
       </div>
     </div>
