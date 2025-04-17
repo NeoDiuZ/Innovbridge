@@ -1,8 +1,10 @@
 .chatContainer {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 100); /* Use the custom vh variable */
   max-height: 100vh;
+  max-height: calc(var(--vh, 1vh) * 100);
   background-color: #f8fafc;
 }
 
@@ -54,6 +56,7 @@
   flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Add smooth scrolling for iOS */
 }
 
 .messagesContainer {
@@ -268,5 +271,118 @@
   
   .chatFooter {
     padding: 0.75rem 1rem;
+  }
+}
+
+/* Additional mobile improvements */
+@media (max-width: 640px) {
+  .chatHeader h1 {
+    font-size: 1.25rem;
+  }
+  
+  .userInfo {
+    gap: 0.5rem;
+  }
+  
+  .userInfo span {
+    font-size: 0.875rem;
+  }
+  
+  .logoutButton {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .chatBody {
+    padding: 0.75rem;
+  }
+  
+  .messagesContainer {
+    gap: 0.75rem;
+  }
+  
+  .messageBox {
+    padding: 0.75rem;
+    max-width: 90%;
+    border-radius: 10px;
+  }
+  
+  .messageContent {
+    font-size: 0.9375rem;
+  }
+  
+  .messageTimestamp {
+    font-size: 0.625rem;
+  }
+  
+  .chatFooter {
+    padding: 0.625rem 0.875rem;
+  }
+  
+  .messageInput {
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+  }
+  
+  .sendButton {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .sendButton svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .typingDots span {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* For landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .chatHeader {
+    padding: 0.5rem 1rem;
+  }
+  
+  .chatHeader h1 {
+    font-size: 1.125rem;
+  }
+  
+  .chatBody {
+    padding: 0.5rem;
+  }
+  
+  .messageBox {
+    padding: 0.625rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .chatFooter {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 380px) {
+  .chatHeader {
+    padding: 0.75rem;
+  }
+  
+  .chatHeader h1 {
+    font-size: 1.125rem;
+  }
+  
+  .userInfo span {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .logoutButton {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.6875rem;
   }
 } 
