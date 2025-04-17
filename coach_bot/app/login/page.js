@@ -91,7 +91,7 @@ export default function Login() {
               </button>
               
               <div className={styles.registerPrompt}>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/register" className={styles.registerLink}>
                   Register now
                 </Link>

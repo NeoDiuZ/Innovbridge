@@ -38,8 +38,10 @@ export default function Chat() {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-    
-    // Add a welcome message when the chat loads, but only once
+  }, []);
+  
+  useEffect(() => {
+    // Add a welcome message when the chat loads, but only once when user is available
     if (user && messages.length === 0) {
       const welcomeMessage = {
         id: Date.now(),
@@ -49,7 +51,7 @@ export default function Chat() {
       };
       setMessages([welcomeMessage]);
     }
-  }, [user]);
+  }, [user, messages.length]);
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
