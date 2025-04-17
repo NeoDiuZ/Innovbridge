@@ -1,180 +1,177 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
-import Link from 'next/link';
+import styles from './register.module.css';
 
 export default function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phoneNumber: ''
+  });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { signUp } = useAuth();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
+    
+    // Validate form
+    if (formData.password !== formData.confirmPassword) {
+      return setError('Passwords do not match');
+    }
+    
+    if (formData.password.length < 8) {
+      return setError('Password must be at least 8 characters');
+    }
+    
     setLoading(true);
     
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-    
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { error } = await signUp({ email, password, username, phoneNumber });
-      if (error) throw error;
-      setSuccess('Account created successfully! Redirecting...');
-      setTimeout(() => router.push('/login'), 2000);
+      const { data, error } = await signUp({ 
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber
+      });
+      
+      if (error) {
+        throw new Error(error.message || 'Failed to create account');
+      }
+      
+      router.push('/chat');
     } catch (err) {
-      setError('Failed to register: ' + err.message);
+      setError(err.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <div className="card auth-card">
-        <div className="auth-header">
-          <div className="auth-logo">
-            🌱
+    <div className={styles.registerContainer}>
+      <div className={styles.registerContentWrapper}>
+        <div className={styles.leftPanel}>
+          <div className={styles.brandInfo}>
+            <h1 className={styles.brandTitle}>Coaching Bot</h1>
+            <p className={styles.brandTagline}>Start your personalized coaching journey today</p>
           </div>
-          <h1 className="auth-title">Coaching Bot</h1>
-          <h2 className="auth-subtitle">Create your account</h2>
         </div>
-
-        {error && (
-          <div className="alert error">
-            {error}
-          </div>
-        )}
         
-        {success && (
-          <div className="alert success">
-            {success}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                placeholder="johndoe"
-                autoComplete="username"
-                className="input"
-              />
-            </div>
+        <div className={styles.rightPanel}>
+          <div className={styles.formContainer}>
+            <h2 className={styles.formTitle}>Create an account</h2>
+            <p className={styles.formSubtitle}>Join us to get personalized AI coaching</p>
             
-            <div className="form-group">
-              <label className="form-label">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-                placeholder="+1 (555) 123-4567"
-                autoComplete="tel"
-                className="input"
-              />
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="you@example.com"
-              autoComplete="email"
-              className="input"
-            />
-          </div>
-          
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                autoComplete="new-password"
-                className="input"
-              />
-            </div>
+            {error && <div className={styles.errorAlert}>{error}</div>}
             
-            <div className="form-group">
-              <label className="form-label">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                autoComplete="new-password"
-                className="input"
-              />
-            </div>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <div className={styles.formGroup}>
+                <label htmlFor="username" className={styles.formLabel}>Username</label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  className={styles.formControl}
+                  placeholder="johndoe"
+                />
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="email" className={styles.formLabel}>Email</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className={styles.formControl}
+                  placeholder="your.email@example.com"
+                />
+              </div>
+              
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="password" className={styles.formLabel}>Password</label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className={styles.formControl}
+                    placeholder="••••••••"
+                  />
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label htmlFor="confirmPassword" className={styles.formLabel}>Confirm Password</label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    className={styles.formControl}
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+              
+              <div className={styles.formGroup}>
+                <label htmlFor="phoneNumber" className={styles.formLabel}>Phone Number (optional)</label>
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className={styles.formControl}
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+              
+              <div className={styles.termsAgreement}>
+                By creating an account, you agree to our <Link href="/terms" className={styles.termsLink}>Terms of Service</Link> and <Link href="/privacy" className={styles.termsLink}>Privacy Policy</Link>.
+              </div>
+              
+              <button 
+                type="submit" 
+                className={styles.submitButton}
+                disabled={loading}
+              >
+                {loading ? 'Creating account...' : 'Create account'}
+              </button>
+              
+              <div className={styles.loginPrompt}>
+                Already have an account?{' '}
+                <Link href="/login" className={styles.loginLink}>
+                  Sign in
+                </Link>
+              </div>
+            </form>
           </div>
-          
-          <button 
-            type="submit" 
-            disabled={loading}
-            className={`button primary ${loading ? 'loading' : ''}`}
-          >
-            {loading ? (
-              <>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="spinner">
-                  <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" 
-                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Creating Account...
-              </>
-            ) : (
-              'Create Account'
-            )}
-          </button>
-        </form>
-        
-        <p className="auth-footer">
-          Already have an account?{' '}
-          <Link href="/login" className="auth-link">
-            Sign in
-          </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
-}
+} 
