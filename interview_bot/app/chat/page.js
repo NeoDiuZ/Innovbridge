@@ -142,7 +142,7 @@ export default function Chat() {
     <div className="chat-container">
       <div className="chat-header">
         <div className="chat-title">Interview Assistant</div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button 
             className="theme-toggle" 
             onClick={toggleTheme}
@@ -187,7 +187,7 @@ export default function Chat() {
             height: '100%',
             color: 'var(--text-muted)',
             textAlign: 'center',
-            padding: '2rem'
+            padding: '1rem'
           }}>
             <h3 style={{ marginBottom: '0.75rem', fontWeight: '600', fontSize: '1rem' }}>Start a Conversation</h3>
             <p style={{ fontSize: '0.875rem' }}>Send a message to begin your interview session.</p>
@@ -217,6 +217,7 @@ export default function Chat() {
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Type your message..."
           disabled={isLoading}
+          style={{ fontSize: '16px' }}
         />
         <button 
           type="submit" 

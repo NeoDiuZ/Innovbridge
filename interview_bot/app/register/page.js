@@ -83,7 +83,11 @@ export default function Register() {
         className="theme-toggle" 
         onClick={toggleTheme}
         aria-label="Toggle dark mode"
-        style={{ opacity: pageLoaded ? 1 : 0 }}
+        style={{ 
+          opacity: pageLoaded ? 1 : 0,
+          top: '1rem',
+          right: '1rem'
+        }}
       >
         {theme === 'light' ? (
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -124,6 +128,7 @@ export default function Register() {
               onChange={handleChange}
               placeholder="johndoe"
               required
+              style={{ fontSize: '16px' }}
             />
           </div>
           
@@ -138,6 +143,7 @@ export default function Register() {
               onChange={handleChange}
               placeholder="you@example.com"
               required
+              style={{ fontSize: '16px' }}
             />
           </div>
           
@@ -152,6 +158,7 @@ export default function Register() {
               onChange={handleChange}
               placeholder="+1 (555) 000-0000"
               required
+              style={{ fontSize: '16px' }}
             />
           </div>
           
@@ -166,6 +173,7 @@ export default function Register() {
               onChange={handleChange}
               placeholder="••••••••"
               required
+              style={{ fontSize: '16px' }}
             />
           </div>
           
@@ -180,6 +188,7 @@ export default function Register() {
               onChange={handleChange}
               placeholder="••••••••"
               required
+              style={{ fontSize: '16px' }}
             />
           </div>
           

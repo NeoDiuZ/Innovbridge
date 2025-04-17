@@ -109,6 +109,18 @@ body {
   overflow-x: hidden;
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+@media (max-width: 768px) {
+  html, body {
+    overscroll-behavior-y: none;
+  }
+  
+  input, textarea, select, button {
+    font-size: 16px; /* Prevents iOS zoom on input focus */
+  }
 }
 
 body {
@@ -240,14 +252,20 @@ a {
 
 .auth-card {
   width: 100%;
-  max-width: 24rem;
+  max-width: 420px;
+  background-color: var(--card-bg);
   padding: 2rem;
-  background: var(--card-bg);
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
   border: 1px solid var(--border-color);
-  animation: slideUpFade var(--animation-medium) ease-out forwards;
+}
+
+@media (max-width: 768px) {
+  .auth-card {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
 }
 
 .auth-card:hover {
@@ -331,28 +349,30 @@ a {
 
 /* Theme toggle */
 .theme-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  color: var(--text-dark);
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
+  position: fixed;
+  right: 1.5rem;
+  top: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--card-bg);
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  z-index: 100;
   transition: all 0.2s ease;
-  animation: fadeIn var(--animation-medium) ease-out forwards;
-  animation-delay: 0.7s;
-  opacity: 0;
-  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.theme-toggle:hover {
-  background-color: var(--background-light);
-  transform: rotate(15deg);
+@media (max-width: 768px) {
+  .theme-toggle {
+    width: 2.25rem;
+    height: 2.25rem;
+    right: 1rem;
+    top: 1rem;
+  }
 }
 
 /* Chat page styles */
@@ -360,19 +380,37 @@ a {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
   background-color: var(--card-bg);
   transition: background-color 0.3s ease;
   animation: fadeIn var(--animation-slow) ease-out;
 }
 
+@media (max-width: 768px) {
+  .chat-container {
+    padding: 0.5rem;
+  }
+}
+
 .chat-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 1rem;
   background-color: var(--card-bg);
-  animation: slideInRight var(--animation-medium) ease-out forwards;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--card-shadow);
+}
+
+@media (max-width: 768px) {
+  .chat-header {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
 }
 
 .chat-title {
@@ -410,43 +448,56 @@ a {
 }
 
 .message {
-  max-width: 70%;
+  max-width: 80%;
   padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  animation-duration: var(--animation-medium);
-  animation-fill-mode: forwards;
-  animation-timing-function: ease-out;
-  opacity: 0;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  animation: fadeIn var(--animation-medium) ease-out forwards;
+  word-break: break-word;
+  color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+  .message {
+    max-width: 85%;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+  }
 }
 
 .message-user {
-  background-color: var(--chat-message-user-bg);
-  color: white;
   align-self: flex-end;
-  border-bottom-right-radius: 0.125rem;
+  background-color: var(--chat-message-user-bg);
+  border-bottom-right-radius: 0.25rem;
   animation-name: slideInRight;
-  transform-origin: bottom right;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .message-bot {
+  align-self: flex-start;
   background-color: var(--chat-message-bot-bg);
   color: var(--text-dark);
-  align-self: flex-start;
-  border-bottom-left-radius: 0.125rem;
-  border: 1px solid var(--border-color);
+  border-bottom-left-radius: 0.25rem;
   animation-name: slideInLeft;
-  transform-origin: bottom left;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .chat-input-container {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border-color);
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
   background-color: var(--card-bg);
-  animation: slideUpFade var(--animation-medium) ease-out forwards;
+  border-radius: 0.75rem;
+  margin-top: auto;
+  box-shadow: var(--card-shadow);
+}
+
+@media (max-width: 768px) {
+  .chat-input-container {
+    padding: 0.6rem;
+    border-radius: 0.5rem;
+  }
 }
 
 .chat-input {
