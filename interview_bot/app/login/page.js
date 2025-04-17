@@ -136,7 +136,7 @@ export default function Login() {
         </form>
         
         <div className="auth-footer" style={{ opacity: pageLoaded ? 1 : 0 }}>
-          Don't have an account? <Link href="/register" className="auth-link">Create an account</Link>
+          Don&apos;t have an account? <Link href="/register" className="auth-link">Create an account</Link>
         </div>
       </div>
     </div>
