@@ -1,32 +1,22 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../contexts/AuthContext';
 import styles from './chat.module.css';
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { user, loading, signOut } = useAuth();
-  const router = useRouter();
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const [sessionId, setSessionId] = useState('');
   
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [loading, user, router]);
-  
-  useEffect(() => {
     // Generate a unique session ID when component mounts
-    if (!sessionId && user) {
-      const newSessionId = `session_${user?.id || 'anonymous'}_${Date.now()}`;
+    if (!sessionId) {
+      const newSessionId = `session_anonymous_${Date.now()}`;
       setSessionId(newSessionId);
     }
-  }, [user, sessionId]);
+  }, [sessionId]);
   
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -41,17 +31,17 @@ export default function Chat() {
   }, []);
   
   useEffect(() => {
-    // Add a welcome message when the chat loads, but only once when user is available
-    if (user && messages.length === 0) {
+    // Add a welcome message when the chat loads
+    if (messages.length === 0) {
       const welcomeMessage = {
         id: Date.now(),
-        content: `Hello ${user?.username || 'there'}! I'm your AI coaching assistant. How can I help you today?`,
+        content: `Hello there! I'm your AI coaching assistant. How can I help you today?`,
         sender: 'bot',
         timestamp: new Date().toISOString()
       };
       setMessages([welcomeMessage]);
     }
-  }, [user, messages.length]);
+  }, [messages.length]);
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -80,8 +70,7 @@ export default function Chat() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
           session_id: sessionId,
@@ -118,32 +107,10 @@ export default function Chat() {
     }
   };
   
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading chat...</p>
-      </div>
-    );
-  }
-  
-  if (!user) {
-    return null;
-  }
-  
   return (
     <div className={styles.chatContainer}>
       <div className={styles.chatHeader}>
         <h1>Coaching Chat</h1>
-        <div className={styles.userInfo}>
-          <span>{user?.username || 'User'}</span>
-          <button 
-            className={styles.logoutButton}
-            onClick={signOut}
-          >
-            Sign Out
-          </button>
-        </div>
       </div>
       
       <div className={styles.chatBody}>

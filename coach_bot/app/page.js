@@ -1,11 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const router = useRouter();
-  const { user } = useAuth();
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
 
   useEffect(() => {
@@ -23,12 +21,8 @@ export default function Home() {
   const isMobile = windowWidth < 768;
 
   useEffect(() => {
-    if (user) {
-      router.push('/chat');
-    } else {
-      router.push('/login');
-    }
-  }, [user, router]);
+    router.push('/chat');
+  }, [router]);
 
   return (
     <div style={{
@@ -55,7 +49,7 @@ export default function Home() {
           color: '#4b5563',
           fontSize: isMobile ? '0.9rem' : '1rem'
         }}>
-          Redirecting you to the right place...
+          Redirecting you to the chat...
         </p>
       </div>
     </div>
