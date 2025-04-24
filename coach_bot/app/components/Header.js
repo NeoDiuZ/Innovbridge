@@ -45,8 +45,8 @@ export default function Header() {
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_name');
     
-    // Redirect to login
-    router.push('/welcome');
+    // Redirect to home page (which now shows login)
+    router.push('/');
   };
   
   return (
