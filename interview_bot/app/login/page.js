@@ -12,13 +12,27 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { login, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   // Set page as loaded after mounting for animations
   useEffect(() => {
     setPageLoaded(true);
   }, []);
+
+  useEffect(() => {
+    // Check if the questionnaire has been completed
+    const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
+    
+    if (!questionnaireCompleted && !user) {
+      router.push('/questionnaire');
+      return;
+    }
+    
+    if (user) {
+      router.push('/chat');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,21 +44,11 @@ export default function Login() {
     button.classList.add('pulse');
 
     try {
-      const { data, error: loginError } = await signIn({ email, password });
-      
-      if (loginError) {
-        throw new Error(loginError.message || 'Failed to login');
-      }
-
-      // Add successful page exit animation
-      document.querySelector('.auth-card').style.opacity = 0;
-      document.querySelector('.auth-card').style.transform = 'translateY(20px)';
-      
-      setTimeout(() => {
-        router.push('/chat');
-      }, 300);
+      await login(email, password);
+      router.push('/chat');
     } catch (err) {
-      setError(err.message || 'An error occurred during login');
+      console.error('Login error:', err);
+      setError('Invalid email or password');
       button.classList.remove('pulse');
     } finally {
       setIsLoading(false);
@@ -84,12 +88,12 @@ export default function Login() {
       
       <div className="auth-card" style={{ opacity: pageLoaded ? 1 : 0, transform: pageLoaded ? 'translateY(0)' : 'translateY(20px)' }}>
         <div className="auth-header" style={{ opacity: pageLoaded ? 1 : 0 }}>
-          <h1 className="auth-title" style={{ opacity: pageLoaded ? 1 : 0 }}>Sign In</h1>
-          <p className="auth-subtitle" style={{ opacity: pageLoaded ? 1 : 0 }}>Enter your credentials to continue</p>
+          <h1 className="auth-title" style={{ opacity: pageLoaded ? 1 : 0 }}>Welcome Back</h1>
+          <p className="auth-subtitle" style={{ opacity: pageLoaded ? 1 : 0 }}>Log in to continue your interview preparation</p>
         </div>
         
         <form className="auth-form" onSubmit={handleSubmit}>
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message mb-4">{error}</div>}
           
           <div className="form-group" style={{ opacity: pageLoaded ? 1 : 0 }}>
             <label htmlFor="email" className="form-label">Email</label>
@@ -119,31 +123,111 @@ export default function Login() {
             />
           </div>
           
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ 
-              width: '100%', 
-              marginTop: '1.5rem',
-              opacity: pageLoaded ? 1 : 0,
-              transition: 'all 0.3s ease'
-            }}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span>
-                Signing in
-                <span className="loading-dot" style={{ width: '4px', height: '4px' }}></span>
-                <span className="loading-dot" style={{ width: '4px', height: '4px' }}></span>
-                <span className="loading-dot" style={{ width: '4px', height: '4px' }}></span>
-              </span>
-            ) : 'Sign In'}
-          </button>
+          <div className="form-group" style={{ opacity: pageLoaded ? 1 : 0 }}>
+            <button 
+              type="submit" 
+              className="btn btn-primary w-full"
+              style={{ 
+                marginTop: '1.5rem',
+                opacity: pageLoaded ? 1 : 0,
+                transition: 'all 0.3s ease'
+              }}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span>
+                  Logging in
+                  <span className="loading-dot" style={{ width: '4px', height: '4px' }}></span>
+                  <span className="loading-dot" style={{ width: '4px', height: '4px' }}></span>
+                  <span className="loading-dot" style={{ width: '4px', height: '4px' }}></span>
+                </span>
+              ) : 'Log In'}
+            </button>
+          </div>
         </form>
         
         <div className="auth-footer" style={{ opacity: pageLoaded ? 1 : 0 }}>
-          Don&apos;t have an account? <Link href="/register" className="auth-link">Create an account</Link>
+          Don&apos;t have an account? <Link href="/register" className="auth-link">Sign up</Link>
         </div>
+
+        {/* Show response from questionnaire if applicable */}
+        {localStorage.getItem('questionnaire_completed') === 'true' && (
+          <div style={{
+            marginTop: '2rem',
+            padding: '1.25rem',
+            borderRadius: '0.75rem',
+            background: 'linear-gradient(to right, #ebf5ff, #e6effe)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.1)',
+            transform: 'translateY(0)',
+            animation: 'fadeInUp 0.6s ease-out',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              background: 'radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 70%)',
+              zIndex: 0
+            }}></div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative',
+              zIndex: 1
+            }}>
+              <div style={{
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                borderRadius: '50%',
+                width: '2.5rem',
+                height: '2.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: '1rem',
+                flexShrink: 0
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <h3 style={{
+                  margin: '0 0 0.25rem 0',
+                  color: '#1e40af',
+                  fontWeight: '600',
+                  fontSize: '1.125rem'
+                }}>
+                  Thanks for completing the questionnaire!
+                </h3>
+                <p style={{
+                  margin: 0,
+                  color: '#3b82f6',
+                  fontSize: '0.9375rem',
+                  lineHeight: 1.5
+                }}>
+                  Your interview practice experience will be personalized based on your responses.
+                </p>
+              </div>
+            </div>
+            <style jsx>{`
+              @keyframes fadeInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(10px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+            `}</style>
+          </div>
+        )}
       </div>
     </div>
   );

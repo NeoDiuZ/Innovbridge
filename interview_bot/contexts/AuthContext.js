@@ -62,72 +62,83 @@ export function AuthProvider({ children }) {
     return data.user;
   };  
 
+  const signUp = async ({ username, email, password, phoneNumber }) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, phoneNumber }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      // Store token
+      localStorage.setItem('authToken', data.token);
+      setUser(data.user);
+      
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  };
+
+  const login = async (email, password) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Invalid credentials');
+      }
+
+      const data = await response.json();
+      
+      // Store token in localStorage
+      localStorage.setItem('authToken', data.token);
+      
+      // Set user in state
+      setUser(data.user);
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = async () => {
+    // Clear localStorage
+    localStorage.removeItem('authToken');
+    
+    // Clear the cookie by calling a logout endpoint
+    await fetch('/api/auth/logout', { method: 'POST' });
+    
+    setUser(null);
+    router.push('/login');
+  };
+
   const value = {
     user,
     loading,
-    signUp: async ({ username, email, password, phoneNumber }) => {
-      try {
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, email, password, phoneNumber }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Registration failed');
-        }
-
-        // Store token
-        localStorage.setItem('authToken', data.token);
-        setUser(data.user);
-        
-        return { data, error: null };
-      } catch (error) {
-        return { data: null, error };
-      }
-    },
-    signIn: async ({ email, password }) => {
-        try {
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-      
-          const data = await response.json();
-      
-          if (!response.ok) {
-            throw new Error(data.message || 'Login failed');
-          }
-      
-          // Store token
-          localStorage.setItem('authToken', data.token);
-      
-          // Immediately fetch and set user
-          const freshUser = await getUser();
-          setUser(freshUser);
-      
-          return { data, error: null };
-        } catch (error) {
-          return { data: null, error };
-        }
-      },      
-    signOut: async () => {
-      // Clear localStorage
-      localStorage.removeItem('authToken');
-      
-      // Clear the cookie by calling a logout endpoint
-      await fetch('/api/auth/logout', { method: 'POST' });
-      
-      setUser(null);
-      router.push('/login');
-    },
+    signUp,
+    signIn: login,
+    login,
+    signOut,
+    setUser,
   };
 
   return (

@@ -17,13 +17,27 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signUp, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   // Set page as loaded after mounting for animations
   useEffect(() => {
     setPageLoaded(true);
   }, []);
+
+  useEffect(() => {
+    // Check if the questionnaire has been completed
+    const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
+    
+    if (!questionnaireCompleted && !user) {
+      router.push('/questionnaire');
+      return;
+    }
+    
+    if (user) {
+      router.push('/chat');
+    }
+  }, [user, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,6 +89,16 @@ export default function Register() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // After registration is successful, display a message about the questionnaire
+  const registrationSuccess = () => {
+    // Update UI or show message
+    setSuccessMessage('Registration successful! Redirecting to login...');
+    
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
   };
 
   return (

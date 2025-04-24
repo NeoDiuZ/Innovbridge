@@ -1,22 +1,37 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import styles from './chat.module.css';
+import { motion } from 'framer-motion';
+import Header from '../components/Header';
+import MessageBubble from '../components/MessageBubble';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import { useRouter } from 'next/navigation';
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const [sessionId, setSessionId] = useState('');
+  const router = useRouter();
   
   useEffect(() => {
+    // Check if user is authenticated
+    const userAuthenticated = localStorage.getItem('user_authenticated') === 'true';
+    
+    if (!userAuthenticated) {
+      // Redirect to login page if not authenticated
+      router.push('/login');
+      return;
+    }
+    
     // Generate a unique session ID when component mounts
     if (!sessionId) {
       const newSessionId = `session_anonymous_${Date.now()}`;
       setSessionId(newSessionId);
     }
-  }, [sessionId]);
+  }, [sessionId, router]);
   
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -35,7 +50,7 @@ export default function Chat() {
     if (messages.length === 0) {
       const welcomeMessage = {
         id: Date.now(),
-        content: `Hello there! I'm your AI coaching assistant. How can I help you today?`,
+        content: `Hello there! I'm your AI interview coach. I can help you prepare for job interviews with practice questions, feedback on your responses, and personalized tips. What would you like to work on today?`,
         sender: 'bot',
         timestamp: new Date().toISOString()
       };
@@ -108,63 +123,88 @@ export default function Chat() {
   };
   
   return (
-    <div className={styles.chatContainer}>
-      <div className={styles.chatHeader}>
-        <h1>Coaching Chat</h1>
-      </div>
+    <div className="h-screen flex flex-col bg-secondary-50">
+      <Header />
       
-      <div className={styles.chatBody}>
-        <div className={styles.messagesContainer}>
-          {messages.map(message => (
-            <div 
-              key={message.id} 
-              className={`${styles.messageBox} ${message.sender === 'user' ? styles.userMessage : styles.botMessage} ${message.error ? styles.errorMessage : ''}`}
-            >
-              <div className={styles.messageContent}>
-                {message.content}
-              </div>
-              <div className={styles.messageTimestamp}>
-                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Main content */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {/* Messages area */}
+          <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
+            <div className="max-w-3xl mx-auto">
+              {messages.map((message, index) => (
+                <MessageBubble 
+                  key={message.id}
+                  message={message.content}
+                  isUser={message.sender === 'user'}
+                  timestamp={message.timestamp}
+                  isError={message.error}
+                />
+              ))}
+              
+              {isLoading && (
+                <MessageBubble 
+                  isUser={false}
+                  isTyping={true}
+                  timestamp={new Date().toISOString()}
+                />
+              )}
+              
+              <div ref={messagesEndRef} />
             </div>
-          ))}
+          </div>
           
-          {isLoading && (
-            <div className={`${styles.messageBox} ${styles.botMessage} ${styles.typingIndicator}`}>
-              <div className={styles.typingDots}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+          {/* Input area */}
+          <div className="border-t border-secondary-200 bg-white p-4">
+            <div className="max-w-3xl mx-auto">
+              <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+                <div className="flex-1 bg-white rounded-xl border border-secondary-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 transition-all duration-200">
+                  <textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage(e);
+                      }
+                    }}
+                    placeholder="Type your message..."
+                    className="w-full p-3 max-h-32 min-h-[3rem] rounded-xl resize-none focus:outline-none"
+                    rows={1}
+                  />
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || !input.trim()} 
+                  isLoading={isLoading}
+                  className="h-11 w-11 p-0 flex-shrink-0 rounded-full"
+                >
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Button>
+              </form>
+              
+              <p className="text-xs text-secondary-500 mt-2 text-center">
+                Press Enter to send, Shift+Enter for a new line
+              </p>
             </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-      
-      <div className={styles.chatFooter}>
-        <form onSubmit={handleSendMessage} className={styles.messageForm}>
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className={styles.messageInput}
-            disabled={isLoading}
-          />
-          <button 
-            type="submit" 
-            className={styles.sendButton}
-            disabled={isLoading || !input.trim()}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </form>
+          </div>
+        </main>
       </div>
     </div>
   );

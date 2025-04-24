@@ -475,12 +475,41 @@ a {
 }
 
 .message-bot {
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  border-radius: 1rem 1rem 1rem 0;
+  padding: 0.75rem 1.25rem;
+  max-width: 80%;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.3s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   align-self: flex-start;
-  background-color: var(--chat-message-bot-bg);
-  color: var(--text-dark);
-  border-bottom-left-radius: 0.25rem;
-  animation-name: slideInLeft;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  line-height: 1.5;
+}
+
+/* Add additional message styling for structured content */
+.message-bot strong {
+  font-weight: 600;
+}
+
+.message-bot p {
+  margin-bottom: 0.75rem;
+}
+
+.message-bot ul, .message-bot ol {
+  margin: 0.5rem 0 0.5rem 1.5rem;
+  padding-left: 1rem;
+}
+
+.message-bot li {
+  margin-bottom: 0.5rem;
+}
+
+/* Ensure proper spacing between question groups */
+.message-bot br + br {
+  display: block;
+  content: "";
+  margin-top: 0.5rem;
 }
 
 .chat-input-container {

@@ -5,7 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const [checkingStatus, setCheckingStatus] = useState(true);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
 
   useEffect(() => {
@@ -23,12 +24,34 @@ export default function Home() {
   const isMobile = windowWidth < 768;
 
   useEffect(() => {
-    if (user) {
-      router.push('/chat');
-    } else {
-      router.push('/login');
-    }
-  }, [user, router]);
+    const checkStatus = () => {
+      if (!loading) {
+        if (user) {
+          router.push('/chat');
+        } else {
+          // Check if the questionnaire has been completed
+          const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
+          if (questionnaireCompleted === 'true') {
+            router.push('/login');
+          } else {
+            router.push('/questionnaire');
+          }
+        }
+        setCheckingStatus(false);
+      }
+    };
+
+    checkStatus();
+  }, [user, loading, router]);
+
+  if (checkingStatus || loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-600">Just a moment...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center" style={{
