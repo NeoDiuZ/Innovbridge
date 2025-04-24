@@ -63,10 +63,13 @@ export default function Login() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Store user info
+      // Store user info in localStorage
       localStorage.setItem('user_authenticated', 'true');
       localStorage.setItem('user_email', email);
       localStorage.setItem('user_name', email.split('@')[0]);
+      
+      // Set auth cookie for middleware
+      document.cookie = "user_authenticated=true; path=/; max-age=86400"; // 24 hours
       
       // Redirect to chat
       router.push('/chat');

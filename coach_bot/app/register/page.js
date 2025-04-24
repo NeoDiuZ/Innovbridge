@@ -24,11 +24,14 @@ export default function Register() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Store user info and authentication state
+      // Store user info and authentication state in localStorage
       localStorage.setItem('questionnaire_completed', 'false');
       localStorage.setItem('user_authenticated', 'true');
       localStorage.setItem('user_email', email);
       localStorage.setItem('user_name', name || email.split('@')[0]);
+      
+      // Set auth cookie for middleware
+      document.cookie = "user_authenticated=true; path=/; max-age=86400"; // 24 hours
       
       // Redirect to login page (which will show questionnaire first)
       router.push('/login');

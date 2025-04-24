@@ -45,6 +45,9 @@ export default function Header() {
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_name');
     
+    // Clear authentication cookie
+    document.cookie = "user_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    
     // Redirect to home page (which now shows login)
     router.push('/');
   };
