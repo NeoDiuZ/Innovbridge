@@ -6,57 +6,57 @@ import { useRouter } from 'next/navigation';
 const questions = [
   {
     id: 1,
-    text: "What's your biggest challenge when preparing for interviews?",
+    text: "What type of job interviews are you preparing for right now?",
     options: [
-      "Coming up with good responses to common questions",
-      "Handling unexpected or difficult questions",
-      "Managing interview anxiety",
-      "Practicing without real feedback",
-      "Tailoring answers to specific roles/companies"
+      "Tech/Engineering roles",
+      "Business/Management positions",
+      "Entry-level/Graduate jobs",
+      "Career transition to a new field",
+      "Senior leadership/Executive roles"
     ]
   },
   {
     id: 2,
-    text: "How often do you practice for interviews?",
+    text: "What's your biggest challenge during actual interviews?",
     options: [
-      "Only right before an interview",
-      "Once or twice before an important interview",
-      "Regularly, but not with structured feedback",
-      "I rarely practice formally",
-      "I have a systematic practice routine"
+      "Articulating my experience clearly and confidently",
+      "Handling unexpected or technical questions",
+      "Controlling nervousness and anxiety",
+      "Knowing what the interviewer is looking for",
+      "Showcasing my skills without sounding arrogant"
     ]
   },
   {
     id: 3,
-    text: "What would help you most with your interview preparation?",
+    text: "How soon are you preparing for an upcoming interview?",
     options: [
-      "Instant feedback on my responses",
-      "Access to a large library of interview questions",
-      "Industry-specific coaching tips",
-      "Flexible practice that fits my schedule",
-      "Ability to track my improvement over time"
+      "This week - I have interviews scheduled",
+      "Within the next month",
+      "Not immediately, but want to be ready",
+      "Just building skills for future opportunities",
+      "Currently employed but exploring options"
     ]
   },
   {
     id: 4,
-    text: "How valuable would it be to have an AI coach available 24/7 for interview practice?",
+    text: "Which CoachBot feature would benefit you most?",
     options: [
-      "Extremely valuable - I'd use it regularly",
-      "Very valuable - especially before important interviews",
-      "Somewhat valuable - I'd try it occasionally",
-      "Slightly valuable - I prefer human coaching",
-      "Not sure - I'd need to experience it first"
+      "Real-time feedback on my interview answers",
+      "Personalized practice based on my industry/role",
+      "Tips to improve my communication and delivery",
+      "Targeted practice for my weak areas",
+      "AI-powered mock interviews available 24/7"
     ]
   },
   {
     id: 5,
-    text: "What's your preferred way to improve your interviewing skills?",
+    text: "How would you like CoachBot to help you succeed?",
     options: [
-      "Practice with real-time feedback",
-      "Learning from expert tips and strategies",
-      "Reviewing recordings of my practice sessions",
-      "Reading interview guides and books",
-      "Role-playing with friends/colleagues"
+      "Build confidence through repeated practice",
+      "Provide expert insights for specific job types",
+      "Help me stand out from other candidates",
+      "Improve my storytelling and example sharing",
+      "Prepare me for tough questions I'm afraid of"
     ]
   }
 ];
@@ -64,7 +64,6 @@ const questions = [
 export default function Questionnaire({ onComplete, isModal = false }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [isCompleted, setIsCompleted] = useState(false);
   const router = useRouter();
 
   // Handle selecting an option
@@ -80,12 +79,7 @@ export default function Questionnaire({ onComplete, isModal = false }) {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // Mark as completed and store in localStorage
-      localStorage.setItem('questionnaire_completed', 'true');
-      localStorage.setItem('questionnaire_answers', JSON.stringify(answers));
-      setIsCompleted(true);
-      
-      // Call the completion callback
+      // Call the completion callback with answers
       if (onComplete) {
         onComplete(answers);
       }
@@ -94,129 +88,57 @@ export default function Questionnaire({ onComplete, isModal = false }) {
 
   // Skip questionnaire
   const handleSkip = () => {
-    localStorage.setItem('questionnaire_completed', 'true');
     if (onComplete) {
       onComplete(null);
     }
   };
 
-  // If already completed, don't show
-  if (isCompleted) {
-    return null;
-  }
-
   const question = questions[currentQuestion];
   const isAnswered = answers[question.id] !== undefined;
 
-  const containerStyles = isModal ? {
-    position: 'fixed', 
-    top: 0, 
-    left: 0, 
-    right: 0, 
-    bottom: 0, 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    backgroundColor: 'rgba(0,0,0,0.5)', 
-    zIndex: 9999
-  } : {
-    width: '100%',
-    maxWidth: '500px',
-    margin: '0 auto'
-  };
-
   return (
-    <div style={containerStyles}>
-      <div style={{ 
-        backgroundColor: 'white', 
-        borderRadius: '8px', 
-        width: '100%', 
-        maxWidth: '500px', 
-        margin: '0 16px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
+    <div className={`w-full max-w-xl mx-auto ${isModal ? 'fixed inset-0 flex items-center justify-center bg-black/50 z-50' : ''}`}>
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-xl overflow-hidden">
         {/* Progress Bar */}
-        <div style={{ 
-          height: '4px', 
-          width: '100%', 
-          backgroundColor: '#f3f4f6'
-        }}>
-          <div style={{ 
-            height: '100%', 
-            backgroundColor: '#3b82f6', 
-            width: `${((currentQuestion + 1) / questions.length) * 100}%`,
-            transition: 'width 0.3s ease-out'
-          }}></div>
+        <div className="w-full h-1.5 bg-gray-100">
+          <div 
+            className="h-full bg-primary-600 transition-all duration-300" 
+            style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+          ></div>
         </div>
         
-        <div style={{ padding: '24px' }}>
-          {/* Header */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ 
-              fontSize: '14px', 
-              color: '#6b7280', 
-              marginBottom: '8px' 
-            }}>
+        <div className="p-6 sm:p-8">
+          {/* Question Header */}
+          <div className="mb-6">
+            <div className="text-sm text-secondary-500 mb-2">
               Question {currentQuestion + 1} of {questions.length}
             </div>
-            <h2 style={{ 
-              fontSize: '18px', 
-              fontWeight: 'bold', 
-              color: '#111827',
-              margin: 0
-            }}>
+            <h2 className="text-xl font-bold text-secondary-900">
               {question.text}
             </h2>
           </div>
           
           {/* Options */}
-          <div style={{ marginBottom: '24px' }}>
+          <div className="space-y-3 mb-8">
             {question.options.map((option, index) => (
               <div 
                 key={index}
                 onClick={() => handleSelect(question.id, option)}
-                style={{ 
-                  padding: '12px 16px',
-                  marginBottom: '8px', 
-                  border: `1px solid ${answers[question.id] === option ? '#3b82f6' : '#d1d5db'}`,
-                  borderRadius: '6px',
-                  backgroundColor: answers[question.id] === option ? '#eff6ff' : 'white', 
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
+                className={`p-4 rounded-lg border transition-all cursor-pointer flex items-center
+                  ${answers[question.id] === option 
+                    ? 'border-primary-500 bg-primary-50' 
+                    : 'border-secondary-200 hover:border-secondary-300 hover:bg-secondary-50'}`}
               >
-                {/* Radio Button Circle */}
-                <div style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  border: `2px solid ${answers[question.id] === option ? '#3b82f6' : '#9ca3af'}`,
-                  backgroundColor: 'white',
-                  marginRight: '12px',
-                  flexShrink: 0,
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
+                {/* Radio Button */}
+                <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center mr-3
+                  ${answers[question.id] === option ? 'border-primary-600' : 'border-secondary-400'}`}>
                   {answers[question.id] === option && (
-                    <div style={{
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      backgroundColor: '#3b82f6'
-                    }}></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary-600"></div>
                   )}
                 </div>
                 
                 {/* Option Text */}
-                <span style={{ 
-                  color: answers[question.id] === option ? '#111827' : '#4b5563',
-                  fontWeight: answers[question.id] === option ? '500' : 'normal',
-                  fontSize: '15px'
-                }}>
+                <span className={`text-base ${answers[question.id] === option ? 'text-secondary-900 font-medium' : 'text-secondary-700'}`}>
                   {option}
                 </span>
               </div>
@@ -224,21 +146,10 @@ export default function Questionnaire({ onComplete, isModal = false }) {
           </div>
           
           {/* Footer */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
+          <div className="flex justify-between items-center">
             <button 
               onClick={handleSkip}
-              style={{
-                background: 'none', 
-                border: 'none', 
-                color: '#6b7280', 
-                fontSize: '14px',
-                cursor: 'pointer',
-                padding: '8px 16px'
-              }}
+              className="text-secondary-500 hover:text-secondary-700 text-sm font-medium"
             >
               Skip for now
             </button>
@@ -246,15 +157,10 @@ export default function Questionnaire({ onComplete, isModal = false }) {
             <button
               onClick={handleNext}
               disabled={!isAnswered}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: isAnswered ? '#3b82f6' : '#e5e7eb',
-                color: isAnswered ? 'white' : '#9ca3af',
-                border: 'none',
-                borderRadius: '6px',
-                fontWeight: '500',
-                cursor: isAnswered ? 'pointer' : 'not-allowed'
-              }}
+              className={`px-5 py-2.5 rounded-lg font-medium transition-colors
+                ${isAnswered 
+                  ? 'bg-primary-600 text-white hover:bg-primary-700' 
+                  : 'bg-secondary-200 text-secondary-400 cursor-not-allowed'}`}
             >
               {currentQuestion < questions.length - 1 ? 'Next' : 'Finish'}
             </button>

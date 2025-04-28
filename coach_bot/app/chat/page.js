@@ -17,21 +17,12 @@ export default function Chat() {
   const router = useRouter();
   
   useEffect(() => {
-    // Check if user is authenticated
-    const userAuthenticated = localStorage.getItem('user_authenticated') === 'true';
-    
-    if (!userAuthenticated) {
-      // Redirect to login page if not authenticated
-      router.push('/login');
-      return;
-    }
-    
     // Generate a unique session ID when component mounts
     if (!sessionId) {
-      const newSessionId = `session_anonymous_${Date.now()}`;
+      const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
     }
-  }, [sessionId, router]);
+  }, [sessionId]);
   
   useEffect(() => {
     // Scroll to bottom when messages change

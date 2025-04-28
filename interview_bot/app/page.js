@@ -1,11 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const router = useRouter();
-  const { user, loading } = useAuth();
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
 
@@ -24,27 +22,21 @@ export default function Home() {
   const isMobile = windowWidth < 768;
 
   useEffect(() => {
-    const checkStatus = () => {
-      if (!loading) {
-        if (user) {
-          router.push('/chat');
-        } else {
-          // Check if the questionnaire has been completed
-          const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
-          if (questionnaireCompleted === 'true') {
-            router.push('/login');
-          } else {
-            router.push('/questionnaire');
-          }
-        }
-        setCheckingStatus(false);
-      }
-    };
+    // Check if questionnaire is completed
+    const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
+    
+    if (questionnaireCompleted === 'true') {
+      // If completed, go directly to chat
+      router.push('/chat');
+    } else {
+      // Default landing - show the questionnaire first
+      router.push('/questionnaire');
+    }
+    
+    setCheckingStatus(false);
+  }, [router]);
 
-    checkStatus();
-  }, [user, loading, router]);
-
-  if (checkingStatus || loading) {
+  if (checkingStatus) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -99,7 +91,7 @@ export default function Home() {
           fontSize: isMobile ? '0.875rem' : '1rem',
           marginBottom: '1.5rem'
         }}>
-          Redirecting you to the right place...
+          Taking you to your interview assistant...
         </p>
         <div style={{
           width: isMobile ? '36px' : '40px',

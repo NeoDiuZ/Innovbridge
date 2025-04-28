@@ -124,6 +124,9 @@ export function AuthProvider({ children }) {
     // Clear localStorage
     localStorage.removeItem('authToken');
     
+    // Set a flag to indicate user just logged out
+    localStorage.setItem('just_logged_out', 'true');
+    
     // Clear the cookie by calling a logout endpoint
     await fetch('/api/auth/logout', { method: 'POST' });
     

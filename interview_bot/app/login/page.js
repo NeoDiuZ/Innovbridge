@@ -24,11 +24,13 @@ export default function Login() {
     // Check if the questionnaire has been completed
     const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
     
+    // If questionnaire not completed, redirect to it first
     if (!questionnaireCompleted && !user) {
       router.push('/questionnaire');
       return;
     }
     
+    // If user is authenticated, redirect to chat
     if (user) {
       router.push('/chat');
     }

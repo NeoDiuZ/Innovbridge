@@ -99,11 +99,6 @@ export default function Questionnaire() {
       router.push('/chat');
     }
     
-    // Check if questionnaire was already completed
-    if (localStorage.getItem('questionnaire_completed') === 'true') {
-      router.push('/login');
-    }
-
     // Add base CSS directly for debugging
     document.body.style.margin = '0';
     document.body.style.padding = '0';
@@ -138,7 +133,7 @@ export default function Questionnaire() {
     localStorage.setItem('questionnaire_answers', JSON.stringify(answers));
     localStorage.setItem('questionnaire_completed', 'true');
     
-    // Redirect to login
+    // Redirect to login after completing the questionnaire
     router.push('/login');
   };
 
@@ -203,7 +198,13 @@ export default function Questionnaire() {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
     }}>
       <div style={{ width: '100%', maxWidth: '36rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ 
+          textAlign: 'center', 
+          marginBottom: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center' 
+        }}>
           <h1 style={{ 
             fontSize: '1.875rem', 
             fontWeight: 'bold', 
@@ -215,7 +216,8 @@ export default function Questionnaire() {
           <p style={{ 
             fontSize: '1rem',
             color: '#3b82f6',
-            opacity: '0.8'
+            opacity: '0.8',
+            marginBottom: '1.5rem'
           }}>
             Let&apos;s personalize your interview experience
           </p>
