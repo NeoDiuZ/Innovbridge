@@ -33,7 +33,7 @@ export default function QuestionnairePage() {
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-secondary-900 mb-4">CoachBot</h1>
         <p className="text-xl text-secondary-600 mb-6">
-          Your personal AI interview coach to help you practice and land your dream job
+          Your personal AI coach to help you achieve your goals and unlock your potential
         </p>
         <p className="text-lg text-secondary-700">
           Please complete this quick survey to help us personalize your experience

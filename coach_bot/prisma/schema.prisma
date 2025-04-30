@@ -10,12 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       String @id @default(uuid())
-  username String @unique
-  email    String @unique
-  password String
-  no       String
+model ChatMessage {
+  id        String   @id @default(uuid())
+  content   String
+  sender    String   // 'user' or 'bot'
+  timestamp DateTime @default(now())
+  sessionId String
+  error     Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

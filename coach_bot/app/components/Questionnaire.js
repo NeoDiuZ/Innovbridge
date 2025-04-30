@@ -2,61 +2,51 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Questions designed to entice users to want to use the interview bot
+// Questions designed to understand user's coaching needs
 const questions = [
   {
-    id: 1,
-    text: "What type of job interviews are you preparing for right now?",
+    id: 'goals',
+    text: "What are your main goals that you'd like to work on?",
     options: [
-      "Tech/Engineering roles",
-      "Business/Management positions",
-      "Entry-level/Graduate jobs",
-      "Career transition to a new field",
-      "Senior leadership/Executive roles"
+      "Personal Development",
+      "Career Growth",
+      "Leadership Skills",
+      "Work-Life Balance",
+      "Other"
     ]
   },
   {
-    id: 2,
-    text: "What's your biggest challenge during actual interviews?",
+    id: 'challenges',
+    text: "What's your biggest challenge right now?",
     options: [
-      "Articulating my experience clearly and confidently",
-      "Handling unexpected or technical questions",
-      "Controlling nervousness and anxiety",
-      "Knowing what the interviewer is looking for",
-      "Showcasing my skills without sounding arrogant"
+      "Setting clear goals",
+      "Staying motivated",
+      "Time management",
+      "Decision making",
+      "Handling stress",
+      "Other"
     ]
   },
   {
-    id: 3,
-    text: "How soon are you preparing for an upcoming interview?",
+    id: 'timeline',
+    text: "What's your preferred timeline for achieving your goals?",
     options: [
-      "This week - I have interviews scheduled",
-      "Within the next month",
-      "Not immediately, but want to be ready",
-      "Just building skills for future opportunities",
-      "Currently employed but exploring options"
+      "Within a month",
+      "3-6 months",
+      "6-12 months",
+      "More than a year",
+      "Not sure yet"
     ]
   },
   {
-    id: 4,
-    text: "Which CoachBot feature would benefit you most?",
+    id: 'preferences',
+    text: "What type of coaching support interests you most?",
     options: [
-      "Real-time feedback on my interview answers",
-      "Personalized practice based on my industry/role",
-      "Tips to improve my communication and delivery",
-      "Targeted practice for my weak areas",
-      "AI-powered mock interviews available 24/7"
-    ]
-  },
-  {
-    id: 5,
-    text: "How would you like CoachBot to help you succeed?",
-    options: [
-      "Build confidence through repeated practice",
-      "Provide expert insights for specific job types",
-      "Help me stand out from other candidates",
-      "Improve my storytelling and example sharing",
-      "Prepare me for tough questions I'm afraid of"
+      "Goal setting and planning",
+      "Regular progress check-ins",
+      "Personalized advice and feedback",
+      "Actionable strategies and tips",
+      "All of the above"
     ]
   }
 ];

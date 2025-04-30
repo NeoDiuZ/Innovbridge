@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../contexts/AuthContext';
 
 const questions = [
   {
@@ -91,19 +90,13 @@ export default function Questionnaire() {
   const [animate, setAnimate] = useState(true);
   const [animateDirection, setAnimateDirection] = useState('slide-left');
   const router = useRouter();
-  const { user } = useAuth();
 
   useEffect(() => {
-    // If user is already logged in, redirect to chat
-    if (user) {
-      router.push('/chat');
-    }
-    
     // Add base CSS directly for debugging
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-  }, [user, router]);
+  }, []);
 
   const handleAnswer = (questionId, optionId) => {
     // Save the answer
@@ -133,8 +126,8 @@ export default function Questionnaire() {
     localStorage.setItem('questionnaire_answers', JSON.stringify(answers));
     localStorage.setItem('questionnaire_completed', 'true');
     
-    // Redirect to login after completing the questionnaire
-    router.push('/login');
+    // Redirect to chat after completing the questionnaire
+    router.push('/chat');
   };
 
   const goToPreviousQuestion = () => {

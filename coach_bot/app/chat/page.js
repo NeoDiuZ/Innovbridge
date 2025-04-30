@@ -21,6 +21,48 @@ export default function Chat() {
     if (!sessionId) {
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
+      
+      // Try to load existing messages from localStorage
+      const savedMessages = localStorage.getItem('chat_messages');
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      } else {
+        // Try to load messages from database
+        const loadMessagesFromDB = async () => {
+          try {
+            const response = await fetch(`/api/chat/load?sessionId=${newSessionId}`);
+            const data = await response.json();
+            
+            if (response.ok && data.messages && data.messages.length > 0) {
+              setMessages(data.messages);
+              localStorage.setItem('chat_messages', JSON.stringify(data.messages));
+            } else {
+              // Add welcome message if no saved messages
+              const welcomeMessage = {
+                id: Date.now(),
+                content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
+                sender: 'bot',
+                timestamp: new Date().toISOString()
+              };
+              setMessages([welcomeMessage]);
+              localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+            }
+          } catch (error) {
+            console.error('Error loading messages from database:', error);
+            // Add welcome message if error loading from database
+            const welcomeMessage = {
+              id: Date.now(),
+              content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
+              sender: 'bot',
+              timestamp: new Date().toISOString()
+            };
+            setMessages([welcomeMessage]);
+            localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+          }
+        };
+        
+        loadMessagesFromDB();
+      }
     }
   }, [sessionId]);
   
@@ -35,19 +77,6 @@ export default function Chat() {
       inputRef.current.focus();
     }
   }, []);
-  
-  useEffect(() => {
-    // Add a welcome message when the chat loads
-    if (messages.length === 0) {
-      const welcomeMessage = {
-        id: Date.now(),
-        content: `Hello there! I'm your AI interview coach. I can help you prepare for job interviews with practice questions, feedback on your responses, and personalized tips. What would you like to work on today?`,
-        sender: 'bot',
-        timestamp: new Date().toISOString()
-      };
-      setMessages([welcomeMessage]);
-    }
-  }, [messages.length]);
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,7 +95,12 @@ export default function Chat() {
       timestamp: new Date().toISOString()
     };
     
-    setMessages(prevMessages => [...prevMessages, userMessage]);
+    setMessages(prevMessages => {
+      const newMessages = [...prevMessages, userMessage];
+      localStorage.setItem('chat_messages', JSON.stringify(newMessages));
+      return newMessages;
+    });
+    
     const userInput = input;
     setInput('');
     setIsLoading(true);
@@ -97,17 +131,56 @@ export default function Chat() {
         timestamp: new Date().toISOString()
       };
       
-      setMessages(prevMessages => [...prevMessages, botResponse]);
+      setMessages(prevMessages => {
+        const newMessages = [...prevMessages, botResponse];
+        localStorage.setItem('chat_messages', JSON.stringify(newMessages));
+        return newMessages;
+      });
+
+      // Save messages to database
+      await fetch('/api/chat/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [userMessage, botResponse],
+          sessionId: sessionId
+        })
+      });
     } catch (error) {
       console.error('Error sending message:', error);
       // Add error message
-      setMessages(prevMessages => [...prevMessages, {
-        id: Date.now(),
-        content: "Sorry, there was an error processing your request. Please try again.",
-        sender: 'bot',
-        error: true,
-        timestamp: new Date().toISOString()
-      }]);
+      setMessages(prevMessages => {
+        const errorMessage = {
+          id: Date.now(),
+          content: "Sorry, there was an error processing your request. Please try again.",
+          sender: 'bot',
+          error: true,
+          timestamp: new Date().toISOString()
+        };
+        const newMessages = [...prevMessages, errorMessage];
+        localStorage.setItem('chat_messages', JSON.stringify(newMessages));
+        return newMessages;
+      });
+
+      // Save error message to database
+      await fetch('/api/chat/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [userMessage, {
+            id: Date.now(),
+            content: "Sorry, there was an error processing your request. Please try again.",
+            sender: 'bot',
+            error: true,
+            timestamp: new Date().toISOString()
+          }],
+          sessionId: sessionId
+        })
+      });
     } finally {
       setIsLoading(false);
     }
@@ -123,6 +196,30 @@ export default function Chat() {
           {/* Messages area */}
           <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
             <div className="max-w-3xl mx-auto">
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => {
+                    setMessages([]);
+                    localStorage.removeItem('chat_messages');
+                    // Add welcome message
+                    const welcomeMessage = {
+                      id: Date.now(),
+                      content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
+                      sender: 'bot',
+                      timestamp: new Date().toISOString()
+                    };
+                    setMessages([welcomeMessage]);
+                    localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+                  }}
+                  className="text-sm text-secondary-500 hover:text-secondary-700 flex items-center gap-1"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Clear chat
+                </button>
+              </div>
+              
               {messages.map((message, index) => (
                 <MessageBubble 
                   key={message.id}

@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 // Helper function to format message text with line breaks and lists
@@ -68,7 +67,6 @@ export default function Chat() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef(null);
   const router = useRouter();
-  const { user, loading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isChatConcluded, setIsChatConcluded] = useState(false);
 
@@ -88,15 +86,11 @@ export default function Chat() {
   // Load chat history from the database when session ID is set
   useEffect(() => {
     const loadChatHistory = async () => {
-      if (!sessionId || !user) return;
+      if (!sessionId) return;
       
       setIsLoadingHistory(true);
       try {
-        const response = await fetch(`/api/chat/history?session_id=${sessionId}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          },
-        });
+        const response = await fetch(`/api/chat/history?session_id=${sessionId}`);
         
         if (response.ok) {
           const data = await response.json();
@@ -123,19 +117,12 @@ export default function Chat() {
     };
     
     loadChatHistory();
-  }, [sessionId, user]);
+  }, [sessionId]);
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -205,7 +192,6 @@ export default function Chat() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         },
         body: JSON.stringify({ 
           session_id: sessionId, 
@@ -277,7 +263,7 @@ export default function Chat() {
     </div>
   );
 
-  if (loading || isLoadingHistory) {
+  if (isLoadingHistory) {
     return (
       <div className="chat-container" style={{ justifyContent: 'center', alignItems: 'center' }}>
         <div className="shimmer" style={{ width: '150px', height: '24px', borderRadius: '4px', margin: '8px 0' }}></div>
@@ -338,13 +324,6 @@ export default function Chat() {
                 <path d="m19.07 4.93-1.41 1.41"></path>
               </svg>
             )}
-          </button>
-          <button 
-            className="btn btn-secondary" 
-            style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}
-            onClick={signOut}
-          >
-            Logout
           </button>
         </div>
       </div>
