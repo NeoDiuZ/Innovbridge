@@ -6,36 +6,21 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id       String @id @default(uuid())
-  username String @unique
-  email    String @unique
-  password String
-  no       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  chatSessions ChatSession[]
-}
-
-model ChatSession {
-  id        String   @id @default(uuid())
-  sessionId String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages  ChatMessage[]
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model ChatMessage {
-  id           String   @id @default(uuid())
-  sessionId    String
-  chatSession  ChatSession @relation(fields: [sessionId], references: [id])
-  role         String   // 'user' or 'assistant' or 'system'
-  content      String   @db.Text   // Using Text type for longer messages
-  createdAt    DateTime @default(now())
+  id        String   @id @default(uuid())
+  content   String
+  sender    String
+  timestamp DateTime @default(now())
+  sessionId String
+  error     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([timestamp])
 }

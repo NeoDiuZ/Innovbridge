@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <title>Interview Bot</title>
-        <meta name="description" content="A interview bot application with authentication" />
+        <meta name="description" content="A interview bot application" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
         <meta name="theme-color" content="#101628" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,9 +18,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <ThemeProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

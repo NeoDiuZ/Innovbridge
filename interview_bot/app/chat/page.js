@@ -70,9 +70,16 @@ export default function Chat() {
   const { theme, toggleTheme } = useTheme();
   const [isChatConcluded, setIsChatConcluded] = useState(false);
 
+  // Check if questionnaire is completed
+  useEffect(() => {
+    const questionnaireCompleted = localStorage.getItem('questionnaire_completed');
+    if (questionnaireCompleted !== 'true') {
+      router.push('/questionnaire');
+    }
+  }, [router]);
+
   // Initialize session ID when component mounts
   useEffect(() => {
-    // Generate a unique session ID if not exists
     const existingSessionId = localStorage.getItem('chatSessionId');
     if (existingSessionId) {
       setSessionId(existingSessionId);
@@ -96,15 +103,12 @@ export default function Chat() {
           const data = await response.json();
           
           if (data.messages && data.messages.length > 0) {
-            // Filter out system messages
-            const chatMessages = data.messages
-              .filter(msg => msg.role !== 'system')
-              .map(msg => ({
-                id: msg.id,
-                text: msg.content,
-                sender: msg.role === 'user' ? 'user' : 'bot',
-                timestamp: msg.createdAt,
-              }));
+            const chatMessages = data.messages.map(msg => ({
+              id: msg.id,
+              text: msg.content,
+              sender: msg.sender,
+              timestamp: msg.timestamp,
+            }));
               
             setMessages(chatMessages);
           }
@@ -173,7 +177,6 @@ export default function Chat() {
     
     if (!inputMessage.trim() || !sessionId || isChatConcluded) return;
     
-    // Add user message to chat
     const userMessage = {
       id: Date.now(),
       text: inputMessage,
@@ -187,7 +190,6 @@ export default function Chat() {
     setIsTyping(true);
     
     try {
-      // API call to get bot response
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -200,17 +202,14 @@ export default function Chat() {
       });
       
       const data = await response.json();
-      
+
       if (!response.ok) {
-        console.error('API error:', data);
-        throw new Error(data.error || data.details || 'Failed to get response');
+        throw new Error(data.error || 'Failed to get response');
       }
       
-      // Simulate typing delay
       setTimeout(() => {
         setIsTyping(false);
         
-        // Add bot response to chat
         const botMessage = {
           id: Date.now() + 1,
           text: data.reply,
@@ -220,30 +219,23 @@ export default function Chat() {
         
         setMessages(prev => [...prev, botMessage]);
         
-        // Check if the chat has concluded based on API response
-        if (data.concluded) {
+        if (data.concluded || checkIfChatConcluded(data.reply)) {
           setIsChatConcluded(true);
-        } else {
-          // Also check with our client-side detection as a fallback
-          if (checkIfChatConcluded(data.reply)) {
-            setIsChatConcluded(true);
-          }
         }
       }, 1000);
       
     } catch (error) {
       console.error('Error sending message:', error);
       
-      // Wait a bit before showing the error to simulate typing
       setTimeout(() => {
         setIsTyping(false);
         
-        // Add error message
         const errorMessage = {
           id: Date.now() + 1,
-          text: `Sorry, there was an error: ${error.message}`,
+          text: `Sorry, there was an error: ${error.message}. Please try again.`,
           sender: 'bot',
           timestamp: new Date().toISOString(),
+          error: true
         };
         
         setMessages(prev => [...prev, errorMessage]);
