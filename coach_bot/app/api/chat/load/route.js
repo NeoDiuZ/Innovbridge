@@ -4,8 +4,10 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const sessionId = searchParams.get('sessionId');
+    console.log('Loading messages for session:', sessionId);
 
     if (!sessionId) {
+      console.error('Missing sessionId');
       return Response.json({ error: 'Missing sessionId' }, { status: 400 });
     }
 
@@ -19,6 +21,8 @@ export async function GET(req) {
       }
     });
 
+    console.log('Found messages:', messages);
+
     // Format messages for frontend
     const formattedMessages = messages.map(message => ({
       id: message.id,
@@ -28,6 +32,7 @@ export async function GET(req) {
       error: message.error
     }));
 
+    console.log('Formatted messages:', formattedMessages);
     return Response.json({ messages: formattedMessages });
   } catch (error) {
     console.error('Error loading messages:', error);

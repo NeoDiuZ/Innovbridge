@@ -6,17 +6,21 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model ChatMessage {
   id        String   @id @default(uuid())
   content   String
-  sender    String   // 'user' or 'bot'
+  sender    String
   timestamp DateTime @default(now())
   sessionId String
   error     Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([timestamp])
 }
