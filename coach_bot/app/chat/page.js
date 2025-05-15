@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 
 // Phrase the bot uses to ask for a rating (must match the system prompt)
 const BOT_RATING_REQUEST_PHRASE = "On a scale of 1-10, how would you rate this coaching session? Please type your rating as a number.";
+const SESSION_ENDED_MARKER = "[SESSION_ENDED_MARKER]"; // New marker
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -17,43 +18,103 @@ export default function Chat() {
   const [sessionId, setSessionId] = useState('');
   const [isClient, setIsClient] = useState(false);
   const [isAwaitingTypedRating, setIsAwaitingTypedRating] = useState(false);
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState(null);
+  const [hasSentQuestionnaireAnswers, setHasSentQuestionnaireAnswers] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const router = useRouter();
   
   useEffect(() => {
     setIsClient(true);
+    const savedAnswers = localStorage.getItem('questionnaire_answers');
+    if (savedAnswers) {
+      try {
+        setQuestionnaireAnswers(JSON.parse(savedAnswers));
+      } catch (e) {
+        console.error("Failed to parse questionnaire answers from localStorage:", e);
+        setQuestionnaireAnswers({});
+      }
+    } else {
+      setQuestionnaireAnswers({});
+    }
   }, []);
   
   useEffect(() => {
     if (!isClient) return;
 
-    if (!sessionId) {
-      const newSessionId = `session_${Date.now()}`;
-      setSessionId(newSessionId);
-      
-      const savedMessages = localStorage.getItem('chat_messages');
-      if (savedMessages) {
-        try {
-          const parsedMessages = JSON.parse(savedMessages);
-          setMessages(parsedMessages);
-        } catch (e) {
-          console.error("Failed to parse messages from localStorage", e);
-          localStorage.removeItem('chat_messages'); 
-          loadInitialMessages(newSessionId); 
+    const handleStorageChange = (event) => {
+      if (event.key === 'questionnaire_answers') {
+        console.log('questionnaire_answers changed in localStorage');
+        let newAnswers = {};
+        if (event.newValue) {
+          try {
+            newAnswers = JSON.parse(event.newValue);
+          } catch (e) {
+            console.error("Failed to parse new questionnaire answers from storage event:", e);
+            // Keep newAnswers as {} if parsing fails
+          }
         }
-      } else {
-        loadInitialMessages(newSessionId);
+        setQuestionnaireAnswers(newAnswers); // Update state
+
+        // Directly orchestrate the chat reset with the new answers
+        setMessages([]);
+        localStorage.removeItem('chat_messages');
+        const newSessionId = `session_${Date.now()}`;
+        setSessionId(newSessionId); 
+        setHasSentQuestionnaireAnswers(false);
+        setIsAwaitingTypedRating(false);
+        addWelcomeMessage(true, newAnswers); // Use newAnswers directly
+        console.log("Chat session has been reset due to questionnaire update.");
       }
-    }
-  }, [isClient, sessionId]);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [isClient]); // addWelcomeMessage is stable, no need to add it as a dependency if it doesn't use component state itself in a way that creates loops
   
+  useEffect(() => {
+    if (!isClient || questionnaireAnswers === null) return;
+
+    if (!sessionId) {
+      initializeSession(questionnaireAnswers);
+    }
+  }, [isClient, sessionId, questionnaireAnswers]);
+  
+  const initializeSession = (currentQuestionnaireAnswers) => {
+    const newSessionId = `session_${Date.now()}`;
+    setSessionId(newSessionId);
+    setHasSentQuestionnaireAnswers(false);
+    setIsAwaitingTypedRating(false);
+    
+    const savedMessages = localStorage.getItem('chat_messages');
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.error("Failed to parse messages from localStorage", e);
+        localStorage.removeItem('chat_messages'); 
+        addWelcomeMessage(true, currentQuestionnaireAnswers);
+      }
+    } else {
+      addWelcomeMessage(true, currentQuestionnaireAnswers);
+    }
+  };
+
+  const resetChatAndSession = () => {
+    setMessages([]);
+    localStorage.removeItem('chat_messages');
+    setSessionId('');
+    console.log("Chat session has been reset.");
+  };
+
   const loadInitialMessages = async (currentSessionId) => {
     try {
       const response = await fetch(`/api/chat/load?sessionId=${currentSessionId}`);
       if (!response.ok) {
         console.error('Failed to load messages from DB:', response.status);
-        addWelcomeMessage();
+        addWelcomeMessage(false, questionnaireAnswers);
         return;
       }
       const data = await response.json();
@@ -62,23 +123,53 @@ export default function Chat() {
         setMessages(data.messages);
         localStorage.setItem('chat_messages', JSON.stringify(data.messages));
       } else {
-        addWelcomeMessage();
+        addWelcomeMessage(true, questionnaireAnswers);
       }
     } catch (error) {
       console.error('Error loading messages from database:', error);
-      addWelcomeMessage();
+      addWelcomeMessage(true, questionnaireAnswers);
     }
   };
 
-  const addWelcomeMessage = () => {
+  const addWelcomeMessage = (isNewSession = false, answers = null) => {
+    let content = `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`;
+
+    if (isNewSession && answers && typeof answers === 'object' && Object.keys(answers).length > 0) {
+      let personalizedPart = "";
+      if (answers.primary_coaching_goal) {
+        personalizedPart = ` I see you're looking to focus on "${answers.primary_coaching_goal}".`;
+      } else if (answers.challenge_to_overcome) {
+         personalizedPart = ` I understand you're working on overcoming "${answers.challenge_to_overcome}".`;
+      } else {
+        const firstKey = Object.keys(answers)[0];
+        if (firstKey && answers[firstKey] && typeof answers[firstKey] === 'string') {
+            const firstAnswerPreview = answers[firstKey].length > 70 ? answers[firstKey].substring(0, 67) + "..." : answers[firstKey];
+            personalizedPart = ` I see you mentioned an interest regarding "${firstAnswerPreview}".`;
+        } else {
+            personalizedPart = " I've received your initial thoughts from the questionnaire.";
+        }
+      }
+      content = `Hello!${personalizedPart} I'm your AI coach, ready to help you achieve your objectives. What would you like to work on today?`;
+    }
+
     const welcomeMessage = {
       id: `welcome_${Date.now()}`,
-      content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
+      content: content,
       sender: 'bot',
       timestamp: new Date().toISOString()
     };
-    setMessages([welcomeMessage]);
-    localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+
+    if (isNewSession) {
+        setMessages([welcomeMessage]);
+        localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+    } else {
+        setMessages(prev => {
+            if (prev.length > 0 && prev[prev.length -1].id.startsWith('welcome_') && prev[prev.length -1].content === content) {
+                return prev;
+            }
+            return [...prev, welcomeMessage];
+        });
+    }
   };
   
   useEffect(() => {
@@ -104,6 +195,16 @@ export default function Chat() {
     const userMessageContent = input;
     setInput('');
 
+    let payload = {
+      session_id: sessionId,
+      message: userMessageContent,
+    };
+
+    if (questionnaireAnswers && Object.keys(questionnaireAnswers).length > 0 && !hasSentQuestionnaireAnswers) {
+      payload.questionnaire_answers = questionnaireAnswers;
+      setHasSentQuestionnaireAnswers(true);
+    }
+
     if (isClient && isAwaitingTypedRating) {
       const extractedRating = parseInt(userMessageContent.match(/\d+/)?.[0], 10);
       if (!isNaN(extractedRating) && extractedRating >= 1 && extractedRating <= 10) {
@@ -113,13 +214,11 @@ export default function Chat() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sessionId: sessionId, rating: extractedRating }),
           });
-          // Optionally, add a local system message confirming rating was sent to DB,
-          // or rely on bot's acknowledgment.
         } catch (error) {
           console.error("Error saving typed rating to DB:", error);
         }
       }
-      setIsAwaitingTypedRating(false); // Reset flag after processing potential rating
+      setIsAwaitingTypedRating(false);
     }
 
     const userMessage = {
@@ -145,7 +244,7 @@ export default function Chat() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, message: userMessageContent })
+        body: JSON.stringify(payload)
       });
       
       if (!response.ok) throw new Error(`Server error: ${response.status} ${response.statusText}`);
@@ -158,7 +257,7 @@ export default function Chat() {
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        let chunk = decoder.decode(value, { stream: true });
+        const chunk = decoder.decode(value, { stream: true });
         accumulatedBotReply += chunk;
         setMessages(prevMessages => 
           prevMessages.map(msg => 
@@ -169,7 +268,14 @@ export default function Chat() {
         );
       }
       
-      const finalBotReplyText = accumulatedBotReply.trim();
+      let finalBotReplyText = accumulatedBotReply.trim();
+      let sessionHasEnded = false;
+
+      if (finalBotReplyText.includes(SESSION_ENDED_MARKER)) {
+        sessionHasEnded = true;
+        finalBotReplyText = finalBotReplyText.replace(SESSION_ENDED_MARKER, '').trim();
+      }
+
       const finalBotMessage = {
         id: botMessageId,
         content: finalBotReplyText,
@@ -178,7 +284,10 @@ export default function Chat() {
         isStreaming: false
       };
 
-      // Update UI and localStorage first
+      if (isClient && finalBotReplyText.includes(BOT_RATING_REQUEST_PHRASE)) {
+        setIsAwaitingTypedRating(true);
+      }
+
       setMessages(prevMessages => {
         const updatedMessages = prevMessages.map(msg => 
           msg.id === botMessageId ? finalBotMessage : msg
@@ -187,17 +296,17 @@ export default function Chat() {
         return updatedMessages;
       });
 
-      // Then, set the rating flag if needed
-      if (isClient && finalBotReplyText.includes(BOT_RATING_REQUEST_PHRASE)) {
-        setIsAwaitingTypedRating(true);
-      }
-
-      // Then, save messages (user + bot) to DB
       fetch('/api/chat/save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ messages: [userMessage, finalBotMessage], sessionId: sessionId })
       }).catch(dbError => console.error("Error saving to DB after stream:", dbError));
+
+      if (sessionHasEnded) {
+        setTimeout(() => {
+          resetChatAndSession();
+        }, 3000);
+      }
 
     } catch (error) {
       console.error('Error sending message or processing stream:', error);
@@ -211,15 +320,13 @@ export default function Chat() {
         timestamp: new Date().toISOString()
       };
 
-      // Update UI and localStorage with the error message
       setMessages(prevMessages => {
-        const filteredMessages = prevMessages.filter(msg => msg.id !== botMessageId || !msg.isStreaming); // Remove placeholder
+        const filteredMessages = prevMessages.filter(msg => msg.id !== botMessageId || !msg.isStreaming);
         const newMessages = [...filteredMessages, errorBotMessage];
         localStorage.setItem('chat_messages', JSON.stringify(newMessages));
         return newMessages;
       });
 
-      // Then, save messages (user + error) to DB
       fetch('/api/chat/save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -242,11 +349,7 @@ export default function Chat() {
             <div className="max-w-3xl mx-auto">
               <div className="flex justify-end mb-4">
                 <button
-                  onClick={() => {
-                    setMessages([]);
-                    localStorage.removeItem('chat_messages');
-                    addWelcomeMessage();
-                  }}
+                  onClick={resetChatAndSession}
                   className="text-sm text-secondary-500 hover:text-secondary-700 flex items-center gap-1"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
