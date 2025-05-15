@@ -12,12 +12,19 @@ export default function Chat() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState('');
+  const [isClient, setIsClient] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const router = useRouter();
   
   useEffect(() => {
-    // Generate a unique session ID when component mounts
+    setIsClient(true);
+  }, []);
+  
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Generate a unique session ID when component mounts if it doesn't exist
     if (!sessionId) {
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
@@ -25,58 +32,69 @@ export default function Chat() {
       // Try to load existing messages from localStorage
       const savedMessages = localStorage.getItem('chat_messages');
       if (savedMessages) {
-        setMessages(JSON.parse(savedMessages));
+        try {
+          const parsedMessages = JSON.parse(savedMessages);
+          setMessages(parsedMessages);
+        } catch (e) {
+          console.error("Failed to parse messages from localStorage", e);
+          localStorage.removeItem('chat_messages'); // Clear corrupted data
+          // Fallback to welcome message or DB load if parsing failed
+          loadInitialMessages(newSessionId); 
+        }
       } else {
-        // Try to load messages from database
-        const loadMessagesFromDB = async () => {
-          try {
-            const response = await fetch(`/api/chat/load?sessionId=${newSessionId}`);
-            const data = await response.json();
-            
-            if (response.ok && data.messages && data.messages.length > 0) {
-              setMessages(data.messages);
-              localStorage.setItem('chat_messages', JSON.stringify(data.messages));
-            } else {
-              // Add welcome message if no saved messages
-              const welcomeMessage = {
-                id: Date.now(),
-                content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
-                sender: 'bot',
-                timestamp: new Date().toISOString()
-              };
-              setMessages([welcomeMessage]);
-              localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
-            }
-          } catch (error) {
-            console.error('Error loading messages from database:', error);
-            // Add welcome message if error loading from database
-            const welcomeMessage = {
-              id: Date.now(),
-              content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
-              sender: 'bot',
-              timestamp: new Date().toISOString()
-            };
-            setMessages([welcomeMessage]);
-            localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
-          }
-        };
-        
-        loadMessagesFromDB();
+        loadInitialMessages(newSessionId);
       }
     }
-  }, [sessionId]);
+  }, [isClient, sessionId]);
+  
+  const loadInitialMessages = async (currentSessionId) => {
+    // Try to load messages from database
+    try {
+      const response = await fetch(`/api/chat/load?sessionId=${currentSessionId}`);
+      if (!response.ok) {
+        // Handle non-OK responses, e.g., log an error or set a default message
+        console.error('Failed to load messages from DB:', response.status);
+        addWelcomeMessage();
+        return;
+      }
+      const data = await response.json();
+      
+      if (data.messages && data.messages.length > 0) {
+        setMessages(data.messages);
+        localStorage.setItem('chat_messages', JSON.stringify(data.messages));
+      } else {
+        addWelcomeMessage();
+      }
+    } catch (error) {
+      console.error('Error loading messages from database:', error);
+      addWelcomeMessage();
+    }
+  };
+
+  const addWelcomeMessage = () => {
+    const welcomeMessage = {
+      id: `welcome_${Date.now()}`, // ID generated purely client-side
+      content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
+      sender: 'bot',
+      timestamp: new Date().toISOString()
+    };
+    setMessages([welcomeMessage]);
+    localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+  };
   
   useEffect(() => {
+    if (!isClient) return;
     // Scroll to bottom when messages change
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isClient]);
   
   useEffect(() => {
+    if (!isClient) return;
     // Focus the input field when component mounts
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, []);
+  }, [isClient]);
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -87,26 +105,35 @@ export default function Chat() {
     
     if (!input.trim()) return;
     
-    // Add user message
+    const userMessageContent = input;
+    setInput(''); // Clear input early
+
     const userMessage = {
-      id: Date.now(),
-      content: input,
+      id: `user_${Date.now()}`,
+      content: userMessageContent,
       sender: 'user',
       timestamp: new Date().toISOString()
     };
     
     setMessages(prevMessages => {
       const newMessages = [...prevMessages, userMessage];
-      localStorage.setItem('chat_messages', JSON.stringify(newMessages));
+      // localStorage.setItem('chat_messages', JSON.stringify(newMessages)); // We'll save after bot response
       return newMessages;
     });
     
-    const userInput = input;
-    setInput('');
     setIsLoading(true);
     
+    // Add a placeholder for the bot's message
+    const botMessageId = `bot_${Date.now()}`;
+    setMessages(prevMessages => [...prevMessages, {
+      id: botMessageId,
+      content: '', // Start with empty content
+      sender: 'bot',
+      timestamp: new Date().toISOString(),
+      isStreaming: true // Add a flag to indicate streaming
+    }]);
+
     try {
-      // Send message to API
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -114,72 +141,91 @@ export default function Chat() {
         },
         body: JSON.stringify({ 
           session_id: sessionId,
-          message: userInput 
+          message: userMessageContent 
         })
       });
-      
-      const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to get response from assistant');
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      if (!response.body) {
+        throw new Error('Response body is null');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedBotReply = '';
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedBotReply += chunk;
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === botMessageId 
+              ? { ...msg, content: accumulatedBotReply, isStreaming: true } 
+              : msg
+          )
+        );
       }
       
-      const botResponse = {
-        id: Date.now(),
-        content: data.reply,
+      // Final update to the bot message, marking streaming as false
+      const finalBotMessage = {
+        id: botMessageId,
+        content: accumulatedBotReply,
         sender: 'bot',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        isStreaming: false
       };
-      
+
       setMessages(prevMessages => {
-        const newMessages = [...prevMessages, botResponse];
-        localStorage.setItem('chat_messages', JSON.stringify(newMessages));
-        return newMessages;
+        const updatedMessages = prevMessages.map(msg => 
+          msg.id === botMessageId ? finalBotMessage : msg
+        );
+        localStorage.setItem('chat_messages', JSON.stringify(updatedMessages));
+         // Save messages to database (user message + final bot message)
+        fetch('/api/chat/save', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+            messages: [userMessage, finalBotMessage],
+            sessionId: sessionId
+            })
+        }).catch(dbError => console.error("Error saving to DB after stream:", dbError));
+        return updatedMessages;
       });
 
-      // Save messages to database
-      await fetch('/api/chat/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [userMessage, botResponse],
-          sessionId: sessionId
-        })
-      });
     } catch (error) {
-      console.error('Error sending message:', error);
-      // Add error message
+      console.error('Error sending message or processing stream:', error);
+      const errorMessageContent = error.message || "Sorry, there was an error processing your request. Please try again.";
       setMessages(prevMessages => {
+        // Remove the streaming placeholder if it exists
+        const filteredMessages = prevMessages.filter(msg => msg.id !== botMessageId || !msg.isStreaming);
         const errorMessage = {
-          id: Date.now(),
-          content: "Sorry, there was an error processing your request. Please try again.",
+          id: `error_${Date.now()}`,
+          content: errorMessageContent,
           sender: 'bot',
           error: true,
           timestamp: new Date().toISOString()
         };
-        const newMessages = [...prevMessages, errorMessage];
+        const newMessages = [...filteredMessages, errorMessage];
         localStorage.setItem('chat_messages', JSON.stringify(newMessages));
+        // Save error message to database
+        fetch('/api/chat/save', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+            messages: [userMessage, errorMessage], // Save user message and the error bot message
+            sessionId: sessionId
+            })
+        }).catch(dbError => console.error("Error saving error to DB:", dbError));
         return newMessages;
-      });
-
-      // Save error message to database
-      await fetch('/api/chat/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [userMessage, {
-            id: Date.now(),
-            content: "Sorry, there was an error processing your request. Please try again.",
-            sender: 'bot',
-            error: true,
-            timestamp: new Date().toISOString()
-          }],
-          sessionId: sessionId
-        })
       });
     } finally {
       setIsLoading(false);
@@ -227,16 +273,9 @@ export default function Chat() {
                   isUser={message.sender === 'user'}
                   timestamp={message.timestamp}
                   isError={message.error}
+                  isStreaming={message.isStreaming}
                 />
               ))}
-              
-              {isLoading && (
-                <MessageBubble 
-                  isUser={false}
-                  isTyping={true}
-                  timestamp={new Date().toISOString()}
-                />
-              )}
               
               <div ref={messagesEndRef} />
             </div>

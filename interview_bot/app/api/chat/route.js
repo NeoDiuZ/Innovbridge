@@ -48,10 +48,10 @@ export async function POST(request) {
       where: { sessionId: session_id },
       orderBy: { createdAt: 'asc' }
     });
-
+2
     // If first message, add the system prompt
     if (existingMessages.length === 0) {
-      const systemPrompt = `
+      const systemPrompt = `e
         You are a professional AI interview assistant. Your goal is to conduct professional job interviews.
         If the user asks in a language other than English, politely request them to use English.
         

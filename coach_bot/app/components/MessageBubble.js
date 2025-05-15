@@ -25,7 +25,7 @@ export default function MessageBubble({
   isUser, 
   timestamp, 
   isError = false,
-  isTyping = false,
+  isStreaming = false,
   animate = true
 }) {
   const formatMessageText = (text) => {
@@ -98,7 +98,7 @@ export default function MessageBubble({
         }`}>
           {/* Message text */}
           <div className={`text-sm whitespace-pre-wrap ${isUser ? 'text-left' : ''}`}>
-            {isTyping ? (
+            {(isStreaming && !message) ? (
               <div className="flex space-x-2 py-1">
                 <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: '0ms' }}></div>
                 <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: '150ms' }}></div>
