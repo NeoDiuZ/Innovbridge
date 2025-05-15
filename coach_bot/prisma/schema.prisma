@@ -24,3 +24,12 @@ model ChatMessage {
   @@index([sessionId])
   @@index([timestamp])
 }
+
+model TypedUserRating {
+  id        String   @id @default(uuid())
+  sessionId String
+  rating    Int
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}

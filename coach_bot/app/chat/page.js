@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Header from '../components/Header';
 import MessageBubble from '../components/MessageBubble';
@@ -7,12 +7,16 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useRouter } from 'next/navigation';
 
+// Phrase the bot uses to ask for a rating (must match the system prompt)
+const BOT_RATING_REQUEST_PHRASE = "On a scale of 1-10, how would you rate this coaching session? Please type your rating as a number.";
+
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [isAwaitingTypedRating, setIsAwaitingTypedRating] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const router = useRouter();
@@ -24,12 +28,10 @@ export default function Chat() {
   useEffect(() => {
     if (!isClient) return;
 
-    // Generate a unique session ID when component mounts if it doesn't exist
     if (!sessionId) {
       const newSessionId = `session_${Date.now()}`;
       setSessionId(newSessionId);
       
-      // Try to load existing messages from localStorage
       const savedMessages = localStorage.getItem('chat_messages');
       if (savedMessages) {
         try {
@@ -37,8 +39,7 @@ export default function Chat() {
           setMessages(parsedMessages);
         } catch (e) {
           console.error("Failed to parse messages from localStorage", e);
-          localStorage.removeItem('chat_messages'); // Clear corrupted data
-          // Fallback to welcome message or DB load if parsing failed
+          localStorage.removeItem('chat_messages'); 
           loadInitialMessages(newSessionId); 
         }
       } else {
@@ -48,11 +49,9 @@ export default function Chat() {
   }, [isClient, sessionId]);
   
   const loadInitialMessages = async (currentSessionId) => {
-    // Try to load messages from database
     try {
       const response = await fetch(`/api/chat/load?sessionId=${currentSessionId}`);
       if (!response.ok) {
-        // Handle non-OK responses, e.g., log an error or set a default message
         console.error('Failed to load messages from DB:', response.status);
         addWelcomeMessage();
         return;
@@ -73,7 +72,7 @@ export default function Chat() {
 
   const addWelcomeMessage = () => {
     const welcomeMessage = {
-      id: `welcome_${Date.now()}`, // ID generated purely client-side
+      id: `welcome_${Date.now()}`,
       content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
       sender: 'bot',
       timestamp: new Date().toISOString()
@@ -84,13 +83,11 @@ export default function Chat() {
   
   useEffect(() => {
     if (!isClient) return;
-    // Scroll to bottom when messages change
     scrollToBottom();
   }, [messages, isClient]);
   
   useEffect(() => {
     if (!isClient) return;
-    // Focus the input field when component mounts
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -102,11 +99,28 @@ export default function Chat() {
   
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
     if (!input.trim()) return;
-    
+
     const userMessageContent = input;
-    setInput(''); // Clear input early
+    setInput('');
+
+    if (isClient && isAwaitingTypedRating) {
+      const extractedRating = parseInt(userMessageContent.match(/\d+/)?.[0], 10);
+      if (!isNaN(extractedRating) && extractedRating >= 1 && extractedRating <= 10) {
+        try {
+          await fetch('/api/chat/save-typed-rating', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: sessionId, rating: extractedRating }),
+          });
+          // Optionally, add a local system message confirming rating was sent to DB,
+          // or rely on bot's acknowledgment.
+        } catch (error) {
+          console.error("Error saving typed rating to DB:", error);
+        }
+      }
+      setIsAwaitingTypedRating(false); // Reset flag after processing potential rating
+    }
 
     const userMessage = {
       id: `user_${Date.now()}`,
@@ -115,43 +129,27 @@ export default function Chat() {
       timestamp: new Date().toISOString()
     };
     
-    setMessages(prevMessages => {
-      const newMessages = [...prevMessages, userMessage];
-      // localStorage.setItem('chat_messages', JSON.stringify(newMessages)); // We'll save after bot response
-      return newMessages;
-    });
-    
+    setMessages(prevMessages => [...prevMessages, userMessage]);
     setIsLoading(true);
     
-    // Add a placeholder for the bot's message
     const botMessageId = `bot_${Date.now()}`;
     setMessages(prevMessages => [...prevMessages, {
       id: botMessageId,
-      content: '', // Start with empty content
+      content: '',
       sender: 'bot',
       timestamp: new Date().toISOString(),
-      isStreaming: true // Add a flag to indicate streaming
+      isStreaming: true
     }]);
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          session_id: sessionId,
-          message: userMessageContent 
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, message: userMessageContent })
       });
       
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status} ${response.statusText}`);
-      }
-
-      if (!response.body) {
-        throw new Error('Response body is null');
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      if (!response.body) throw new Error('Response body is null');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -160,7 +158,7 @@ export default function Chat() {
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
+        let chunk = decoder.decode(value, { stream: true });
         accumulatedBotReply += chunk;
         setMessages(prevMessages => 
           prevMessages.map(msg => 
@@ -171,67 +169,67 @@ export default function Chat() {
         );
       }
       
-      // Final update to the bot message, marking streaming as false
+      const finalBotReplyText = accumulatedBotReply.trim();
       const finalBotMessage = {
         id: botMessageId,
-        content: accumulatedBotReply,
+        content: finalBotReplyText,
         sender: 'bot',
         timestamp: new Date().toISOString(),
         isStreaming: false
       };
 
+      // Update UI and localStorage first
       setMessages(prevMessages => {
         const updatedMessages = prevMessages.map(msg => 
           msg.id === botMessageId ? finalBotMessage : msg
         );
         localStorage.setItem('chat_messages', JSON.stringify(updatedMessages));
-         // Save messages to database (user message + final bot message)
-        fetch('/api/chat/save', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-            messages: [userMessage, finalBotMessage],
-            sessionId: sessionId
-            })
-        }).catch(dbError => console.error("Error saving to DB after stream:", dbError));
         return updatedMessages;
       });
+
+      // Then, set the rating flag if needed
+      if (isClient && finalBotReplyText.includes(BOT_RATING_REQUEST_PHRASE)) {
+        setIsAwaitingTypedRating(true);
+      }
+
+      // Then, save messages (user + bot) to DB
+      fetch('/api/chat/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [userMessage, finalBotMessage], sessionId: sessionId })
+      }).catch(dbError => console.error("Error saving to DB after stream:", dbError));
 
     } catch (error) {
       console.error('Error sending message or processing stream:', error);
       const errorMessageContent = error.message || "Sorry, there was an error processing your request. Please try again.";
+      
+      const errorBotMessage = {
+        id: `error_${Date.now()}`,
+        content: errorMessageContent,
+        sender: 'bot',
+        error: true,
+        timestamp: new Date().toISOString()
+      };
+
+      // Update UI and localStorage with the error message
       setMessages(prevMessages => {
-        // Remove the streaming placeholder if it exists
-        const filteredMessages = prevMessages.filter(msg => msg.id !== botMessageId || !msg.isStreaming);
-        const errorMessage = {
-          id: `error_${Date.now()}`,
-          content: errorMessageContent,
-          sender: 'bot',
-          error: true,
-          timestamp: new Date().toISOString()
-        };
-        const newMessages = [...filteredMessages, errorMessage];
+        const filteredMessages = prevMessages.filter(msg => msg.id !== botMessageId || !msg.isStreaming); // Remove placeholder
+        const newMessages = [...filteredMessages, errorBotMessage];
         localStorage.setItem('chat_messages', JSON.stringify(newMessages));
-        // Save error message to database
-        fetch('/api/chat/save', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-            messages: [userMessage, errorMessage], // Save user message and the error bot message
-            sessionId: sessionId
-            })
-        }).catch(dbError => console.error("Error saving error to DB:", dbError));
         return newMessages;
       });
+
+      // Then, save messages (user + error) to DB
+      fetch('/api/chat/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [userMessage, errorBotMessage], sessionId: sessionId })
+      }).catch(dbError => console.error("Error saving error to DB:", dbError));
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="h-screen flex flex-col bg-secondary-50">
       <Header />
@@ -247,15 +245,7 @@ export default function Chat() {
                   onClick={() => {
                     setMessages([]);
                     localStorage.removeItem('chat_messages');
-                    // Add welcome message
-                    const welcomeMessage = {
-                      id: Date.now(),
-                      content: `Hello! I'm your AI coach, here to support and guide you on your journey. I can help you set goals, develop strategies, and provide personalized advice to help you grow. What would you like to work on today?`,
-                      sender: 'bot',
-                      timestamp: new Date().toISOString()
-                    };
-                    setMessages([welcomeMessage]);
-                    localStorage.setItem('chat_messages', JSON.stringify([welcomeMessage]));
+                    addWelcomeMessage();
                   }}
                   className="text-sm text-secondary-500 hover:text-secondary-700 flex items-center gap-1"
                 >
@@ -266,15 +256,17 @@ export default function Chat() {
                 </button>
               </div>
               
-              {messages.map((message, index) => (
-                <MessageBubble 
-                  key={message.id}
-                  message={message.content}
-                  isUser={message.sender === 'user'}
-                  timestamp={message.timestamp}
-                  isError={message.error}
-                  isStreaming={message.isStreaming}
-                />
+              {messages.map((message) => (
+                <React.Fragment key={message.id}>
+                  <MessageBubble 
+                    message={message.content}
+                    isUser={message.sender === 'user'}
+                    isSystem={message.sender === 'system'}
+                    timestamp={message.timestamp}
+                    isError={message.error}
+                    isStreaming={message.isStreaming}
+                  />
+                </React.Fragment>
               ))}
               
               <div ref={messagesEndRef} />
@@ -285,26 +277,25 @@ export default function Chat() {
           <div className="border-t border-secondary-200 bg-white p-4">
             <div className="max-w-3xl mx-auto">
               <form onSubmit={handleSendMessage} className="flex items-end gap-3">
-                <div className="flex-1 bg-white rounded-xl border border-secondary-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 transition-all duration-200">
-                  <textarea
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage(e);
-                      }
-                    }}
-                    placeholder="Type your message..."
-                    className="w-full p-3 max-h-32 min-h-[3rem] rounded-xl resize-none focus:outline-none"
-                    rows={1}
-                  />
-                </div>
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(e);
+                    }
+                  }}
+                  placeholder={"Type your message..."}
+                  className="w-full p-3 max-h-32 min-h-[3rem] rounded-xl resize-none focus:outline-none border border-secondary-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 transition-all duration-200"
+                  rows={1}
+                  disabled={false}
+                />
                 
                 <Button 
                   type="submit" 
-                  disabled={isLoading || !input.trim()} 
+                  disabled={isLoading || !input.trim()}
                   isLoading={isLoading}
                   className="h-11 w-11 p-0 flex-shrink-0 rounded-full"
                 >
