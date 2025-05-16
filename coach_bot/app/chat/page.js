@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import MessageBubble from '../components/MessageBubble';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import EmailPopup from '../components/EmailPopup';
 import { useRouter } from 'next/navigation';
 
 // Phrase the bot uses to ask for a rating (must match the system prompt)
@@ -20,6 +21,7 @@ export default function Chat() {
   const [isAwaitingTypedRating, setIsAwaitingTypedRating] = useState(false);
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState(null);
   const [hasSentQuestionnaireAnswers, setHasSentQuestionnaireAnswers] = useState(false);
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const router = useRouter();
@@ -303,9 +305,7 @@ export default function Chat() {
       }).catch(dbError => console.error("Error saving to DB after stream:", dbError));
 
       if (sessionHasEnded) {
-        setTimeout(() => {
-          resetChatAndSession();
-        }, 3000);
+        setShowEmailPopup(true);
       }
 
     } catch (error) {
@@ -335,6 +335,36 @@ export default function Chat() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEmailSubmit = async (email) => {
+    // console.log('Email submitted:', email, 'for session:', sessionId);
+    // Here you would call your API to send the summary
+    try {
+      const response = await fetch('/api/chat/send-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, email, messages }), // Send messages for summary
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send summary.');
+      }
+      // alert('Summary will be sent to your email!'); // Or use a more sophisticated notification
+    } catch (error) {
+      console.error('Error sending summary email:', error);
+      // Here, you might want to inform the user on the popup itself.
+      // For now, we'll throw the error so the popup's error state can catch it.
+      throw error; 
+    } finally {
+      setShowEmailPopup(false);
+      resetChatAndSession();
+    }
+  };
+
+  const handleCloseEmailPopup = () => {
+    setShowEmailPopup(false);
+    resetChatAndSession(); // Reset chat even if they close without submitting
   };
 
   return (
@@ -427,6 +457,12 @@ export default function Chat() {
           </div>
         </main>
       </div>
+
+      <EmailPopup
+        isOpen={showEmailPopup}
+        onClose={handleCloseEmailPopup}
+        onSubmit={handleEmailSubmit}
+      />
     </div>
   );
 } 
