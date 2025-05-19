@@ -25,24 +25,30 @@ async function generateSummary(messages) {
     .join('\n');
 
   const prompt = `
-Summarize the following coaching session conversation. Focus on:
-1.  The user\'s main goals or topics discussed.
-2.  Key insights or advice provided by the coach.
-3.  Any actionable steps or recommendations agreed upon.
-Keep the summary concise and clear.
+As a helpful assistant, please craft a personalized summary of the following coaching session conversation. The summary should be written in a warm, supportive tone and should:
+
+1. Focus on the user's journey, challenges, and achievements
+2. Highlight key insights and breakthroughs from the conversation
+3. Include 2-3 specific, actionable recommendations based on the user's unique situation
+4. Use "you" and "your" to make it more personal and direct
+5. Acknowledge the user's progress and growth
+6. End with an encouraging note
+7. Do not use greetings (like 'Dear User') or sign-offs (like 'Warm regards') in your summary
+
+Please present this as a flowing narrative, not as a bulleted list. This summary will be sent to the user in an email after their coaching session.
 
 Conversation:
 ${conversationHistory}
 
-Summary:
+Personalized Summary and Recommendations:
 `;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Or your preferred model
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.5, // Adjust for desired creativity/factuality
-      max_tokens: 300, // Adjust based on expected summary length
+      temperature: 0.7, // Slightly increased for more personalized responses
+      max_tokens: 500, // Increased to accommodate recommendations
     });
     return completion.choices[0]?.message?.content?.trim() || "Could not generate summary.";
   } catch (error) {
@@ -196,6 +202,8 @@ export default async function handler(req, res) {
             </div>
             
             <p class="footer"><em>This is an automated email. Please do not reply directly.</em></p>
+            <p class="footer"><em>If you have any questions or need assistance, please contact us at <a href="mailto:steve@innovbridgeasia.com">steve@innovbridgeasia.com</a>.</em></p>
+            <p class="footer"><em>InnovBridge Asia. All rights reserved.</em></p>
           </div>
         </body>
         </html>
