@@ -1,34 +1,14 @@
-import dynamic from 'next/dynamic';
-import React, { Suspense } from 'react';
+import ChatPageClientBoundary from './ChatPageClientBoundary';
+import React from 'react';
 
-// Loading fallback component
-function ChatLoading() {
-  return (
-    <div className="h-screen flex flex-col bg-secondary-50">
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-4 border-4 border-secondary-200 border-t-primary-600 rounded-full animate-spin"></div>
-          <p className="text-secondary-600">Loading interview session...</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+// The main ChatLoading component (previously in page.js) can be kept if needed elsewhere,
+// or removed if ClientSpecificLoading in ChatPageClientBoundary is sufficient.
+// For this example, we assume ChatPageClientBoundary handles its own loading state
+// for the parts that need suspense due to useSearchParams.
 
-// Dynamically import the new client boundary component with no SSR
-const ChatPageClientBoundary = dynamic(
-  () => import('./ChatPageClientBoundary'), // Import the new boundary
-  {
-    ssr: false,
-    loading: () => <ChatLoading />
-  }
-);
-
-// Main page component (Server Component)
 export default function InterviewChatPage() {
-  return (
-    <Suspense fallback={<ChatLoading />}>
-      <ChatPageClientBoundary />
-    </Suspense>
-  );
+  // This page is a Server Component by default.
+  // It renders the ChatPageClientBoundary, which is a Client Component
+  // and internally handles the Suspense for useSearchParams.
+  return <ChatPageClientBoundary />;
 } 
