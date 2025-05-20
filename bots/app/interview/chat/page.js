@@ -1,12 +1,13 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Header from '../../components/Header';
 import MessageBubble from '../../components/MessageBubble';
 import Button from '../../components/ui/Button';
 import EmailPopup from '../../components/EmailPopup';
 
-export default function InterviewChat() {
+// Renamed from InterviewChat to ChatClientComponent
+function ChatClientComponent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [messages, setMessages] = useState([]);
@@ -346,5 +347,14 @@ export default function InterviewChat() {
         onSubmit={handleEmailPopup}
       />
     </div>
+  );
+}
+
+// New default export component
+export default function InterviewChatPage() {
+  return (
+    <Suspense fallback={<div>Loading interview chat...</div>}>
+      <ChatClientComponent />
+    </Suspense>
   );
 } 
