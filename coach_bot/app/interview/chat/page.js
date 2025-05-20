@@ -6,9 +6,22 @@ import MessageBubble from '../../components/MessageBubble';
 import Button from '../../components/ui/Button';
 import EmailPopup from '../../components/EmailPopup';
 
-// Separate component for the main chat functionality
-function InterviewChatContent() {
+// Separate component for handling search params
+function SearchParamsHandler({ children }) {
   const searchParams = useSearchParams();
+  const interviewData = React.useMemo(() => {
+    try {
+      return JSON.parse(decodeURIComponent(searchParams.get('data') || '{}'));
+    } catch {
+      return {};
+    }
+  }, [searchParams]);
+
+  return children(interviewData);
+}
+
+// Separate component for the main chat functionality
+function InterviewChatContent({ interviewData }) {
   const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -26,14 +39,6 @@ function InterviewChatContent() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   
-  const interviewData = React.useMemo(() => {
-    try {
-      return JSON.parse(decodeURIComponent(searchParams.get('data') || '{}'));
-    } catch {
-      return {};
-    }
-  }, [searchParams]);
-
   useEffect(() => {
     setIsClient(true);
     if (!sessionId) {
@@ -370,7 +375,9 @@ function ChatLoading() {
 export default function InterviewChatPage() {
   return (
     <Suspense fallback={<ChatLoading />}>
-      <InterviewChatContent />
+      <SearchParamsHandler>
+        {(interviewData) => <InterviewChatContent interviewData={interviewData} />}
+      </SearchParamsHandler>
     </Suspense>
   );
 } 
