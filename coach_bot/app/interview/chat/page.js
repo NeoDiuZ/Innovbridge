@@ -1,4 +1,3 @@
-'use client';
 import dynamic from 'next/dynamic';
 import React, { Suspense } from 'react';
 
@@ -16,20 +15,20 @@ function ChatLoading() {
   );
 }
 
-// Dynamically import the chat component with no SSR
-const InterviewChatContent = dynamic(
-  () => import('./InterviewChatContent'),
+// Dynamically import the new client boundary component with no SSR
+const ChatPageClientBoundary = dynamic(
+  () => import('./ChatPageClientBoundary'), // Import the new boundary
   {
     ssr: false,
     loading: () => <ChatLoading />
   }
 );
 
-// Main page component
+// Main page component (Server Component)
 export default function InterviewChatPage() {
   return (
     <Suspense fallback={<ChatLoading />}>
-      <InterviewChatContent />
+      <ChatPageClientBoundary />
     </Suspense>
   );
 } 
