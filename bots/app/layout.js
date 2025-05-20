@@ -16,7 +16,8 @@ export default function RootLayout({ children }) {
         <meta name="description" content="Get personalized guidance and support from our AI coach to help you achieve your goals and unlock your potential." />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="theme-color" content="#0ea5e9" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Innovbridge" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="icon" href="/favicon.ico" />
       </head>
