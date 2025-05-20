@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 const botVariants = {
   hidden: { opacity: 0, x: -20 },
@@ -30,33 +31,42 @@ export default function MessageBubble({
 }) {
   const formatMessageText = (text) => {
     if (!text) return '';
-    
-    // Handle code blocks
-    return text
-      .split('```')
-      .map((segment, index) => {
-        if (index % 2 === 0) {
-          // Regular text - handle line breaks
-          return <span key={index}>{segment.split('\n').map((line, i) => (
-            <React.Fragment key={i}>
-              {line}
-              {i < segment.split('\n').length - 1 && <br />}
-            </React.Fragment>
-          ))}</span>;
-        } else {
-          // Code block
-          const [language, ...codeLines] = segment.split('\n');
-          const code = codeLines.join('\n');
-          return (
-            <div key={index} className="my-2 rounded-md bg-secondary-800 p-3 overflow-x-auto">
-              {language && (
-                <div className="text-xs text-secondary-400 mb-1">{language}</div>
-              )}
-              <pre className="text-sm text-secondary-200 font-mono">{code}</pre>
-            </div>
-          );
-        }
-      });
+
+    // Split by code blocks, render code blocks separately for styling
+    const segments = text.split('```');
+    return segments.map((segment, index) => {
+      if (index % 2 === 0) {
+        // Regular markdown text (headings, bold, etc.)
+        return (
+          <ReactMarkdown
+            key={index}
+            components={{
+              h3: ({node, ...props}) => <h3 className="text-base font-bold mt-3 mb-1" {...props} />,
+              strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+              p: ({node, ...props}) => <p className="mb-2" {...props} />,
+              ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2" {...props} />,
+              li: ({node, ...props}) => <li className="mb-1" {...props} />,
+              a: ({node, ...props}) => <a className="text-primary-600 underline" {...props} />,
+              // Add more custom renderers as needed
+            }}
+          >{segment}</ReactMarkdown>
+        );
+      } else {
+        // Code block
+        const [language, ...codeLines] = segment.split('\n');
+        const code = codeLines.join('\n');
+        return (
+          <div key={index} className="my-2 rounded-md bg-secondary-800 p-3 overflow-x-auto max-w-full">
+            {language && (
+              <div className="text-xs text-secondary-400 mb-1">{language}</div>
+            )}
+            <pre className="text-sm text-secondary-200 font-mono whitespace-pre break-all max-w-full overflow-x-auto">
+              {code}
+            </pre>
+          </div>
+        );
+      }
+    });
   };
 
   const formattedTime = timestamp
@@ -89,7 +99,7 @@ export default function MessageBubble({
 
       {/* Message content */}
       <div className={`relative max-w-2xl ${isUser ? 'text-right' : 'text-left'}`}>
-        <div className={`inline-block rounded-2xl px-4 py-3 ${
+        <div className={`inline-block rounded-2xl px-4 py-3 max-w-full ${
           isUser
             ? 'bg-primary-600 text-white'
             : isError

@@ -1,98 +1,6 @@
-import { OpenAI } from 'openai';
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { generateSummary, sendEmailWithSES } from '@/lib/sendEmail';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Initialize SES client
-const sesClient = new SESClient({
-  region: process.env.AWS_REGION_VAL,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID_VAL,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY_VAL,
-  },
-});
-
-const FROM_EMAIL = process.env.AWS_SES_FROM_EMAIL;
-
-async function generateSummary(messages) {
-  // Filter out system messages and prepare the conversation for the prompt
-  const conversationHistory = messages
-    .filter(msg => msg.sender === 'user' || msg.sender === 'bot')
-    .map(msg => `${msg.sender === 'user' ? 'User' : 'Coach'}: ${msg.content}`)
-    .join('\n');
-
-  const prompt = `
-As a helpful assistant, please craft a personalized summary of the following coaching session conversation. The summary should be written in a warm, supportive tone and should:
-
-1. Focus on the user's journey, challenges, and achievements
-2. Highlight key insights and breakthroughs from the conversation
-3. Include 2-3 specific, actionable recommendations based on the user's unique situation
-4. Use "you" and "your" to make it more personal and direct
-5. Acknowledge the user's progress and growth
-6. End with an encouraging note
-7. Do not use greetings (like 'Dear User') or sign-offs (like 'Warm regards') in your summary
-
-Please present this as a flowing narrative, not as a bulleted list. This summary will be sent to the user in an email after their coaching session.
-
-Conversation:
-${conversationHistory}
-
-Personalized Summary and Recommendations:
-`;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7, // Slightly increased for more personalized responses
-      max_tokens: 500, // Increased to accommodate recommendations
-    });
-    return completion.choices[0]?.message?.content?.trim() || "Could not generate summary.";
-  } catch (error) {
-    console.error("Error generating summary with OpenAI:", error);
-    throw new Error("Failed to generate summary.");
-  }
-}
-
-async function sendEmailWithSES({ to, subject, htmlBody, textBody }) {
-  const params = {
-    Destination: {
-      ToAddresses: [to],
-    },
-    Message: {
-      Body: {
-        Html: {
-          Charset: "UTF-8",
-          Data: htmlBody,
-        },
-        Text: {
-          Charset: "UTF-8",
-          Data: textBody,
-        },
-      },
-      Subject: {
-        Charset: "UTF-8",
-        Data: subject,
-      },
-    },
-    Source: FROM_EMAIL, // This must be a verified SES email address
-  };
-
-  try {
-    const command = new SendEmailCommand(params);
-    const data = await sesClient.send(command);
-    console.log("Email sent successfully via SES:", data.MessageId);
-    return data;
-  } catch (error) {
-    console.error("Error sending email with SES:", error);
-    throw new Error(`Failed to send email: ${error.message}`);
-  }
-}
-
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'POST') {
     const { sessionId, email, messages } = req.body;
 
@@ -108,7 +16,7 @@ export default async function handler(req, res) {
     console.log(`Received request to send summary for session ${sessionId} to ${email}`);
 
     try {
-      const summaryText = await generateSummary(messages);
+      const summaryText = await generateSummary(messages, 'coaching');
 
       // Construct email content
       const subject = `Your Coaching Session Summary - Session ID: ${sessionId}`;
@@ -245,9 +153,4 @@ This is an automated email. Please do not reply directly.
   }
 }
 
-// Example placeholder for an email sending function (you'd use a real library)
-// async function sendEmail({ to, subject, html }) {
-//   console.log(`Simulating email send to: ${to}, Subject: ${subject}`);
-//   // Actual email sending logic here
-//   return Promise.resolve();
-// } 
+export default handler;

@@ -3,13 +3,7 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
   const url = request.nextUrl.clone();
   
-  // If accessing root/landing page, go to questionnaire
-  if (url.pathname === '/') {
-    // Always go to questionnaire page first
-    url.pathname = '/questionnaire';
-    return NextResponse.redirect(url);
-  }
-  
+  // Add any middleware logic here if needed
   return NextResponse.next();
 }
 

@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './ui/Button';
 
-export default function Header() {
+export default function Header({ title = 'CoachBot' }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function Header() {
                 <path d="M19.4 7.34L16.66 4.6A2 2 0 0 0 14 4.53l-9 9a2 2 0 0 0-.57 1.21L4 18.91a1 1 0 0 0 .29.8A1 1 0 0 0 5 20h.09l4.17-.38a2 2 0 0 0 1.21-.57l9-9a1.92 1.92 0 0 0-.07-2.71z" fill="currentColor"/>
               </svg>
             </div>
-            <h1 className="text-lg font-semibold text-secondary-900">CoachBot</h1>
+            <h1 className="text-lg font-semibold text-secondary-900">{title}</h1>
           </div>
         </div>
         
