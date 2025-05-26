@@ -1,0 +1,110 @@
+INNOVBRIDGE FAQ KNOWLEDGE BASE
+
+ABOUT INNOVBRIDGE
+=================
+
+What is InnovBridge?
+InnovBridge is an AI-powered platform that provides intelligent assistants to help users achieve their goals. We offer specialized bots for coaching, interview preparation, and answering questions through our FAQ system.
+
+Who can use InnovBridge?
+InnovBridge is designed for anyone looking to improve their skills, prepare for interviews, or get instant answers to their questions. Our platform is suitable for students, professionals, job seekers, and anyone interested in personal development.
+
+AVAILABLE BOTS
+==============
+
+CoachBot
+--------
+CoachBot is your personal AI coach that follows International Coaching Federation (ICF) guidelines. It helps users:
+- Set and achieve personal goals
+- Develop action plans
+- Build self-awareness
+- Create accountability structures
+- Navigate life and career challenges
+
+InterviewBot
+-----------
+InterviewBot helps users prepare for job interviews by:
+- Conducting mock interviews
+- Providing feedback on answers
+- Offering practice questions for different roles
+- Supporting various interview types (behavioral, technical, system design)
+- Helping users improve their interview skills
+
+FAQ Bot
+-------
+The FAQ Bot provides instant answers to questions using a customizable knowledge base. It can:
+- Answer questions based on uploaded content
+- Provide information about products, services, or policies
+- Help with documentation and support queries
+- Offer 24/7 assistance based on your knowledge base
+
+TECHNICAL FEATURES
+==================
+
+How does the platform work?
+Our platform uses advanced AI technology (GPT-4) to provide intelligent, context-aware responses. Each bot is specifically trained for its purpose and maintains conversation history for better interaction.
+
+Is my data secure?
+Yes, we prioritize data security. Conversations are stored temporarily for the session and are not used to train models or shared with third parties.
+
+Can I customize the bots?
+Currently, the FAQ Bot allows you to upload your own knowledge base content. Future updates may include more customization options for other bots.
+
+GETTING STARTED
+===============
+
+How do I start using InnovBridge?
+1. Visit the main page and choose your preferred bot
+2. For CoachBot: Complete the questionnaire to personalize your coaching session
+3. For InterviewBot: Fill out your interview details and preferences
+4. For FAQ Bot: Upload your knowledge base content and start asking questions
+
+What if I need help?
+If you need assistance with the platform, you can:
+- Use the FAQ Bot to search this knowledge base
+- Contact our support team
+- Refer to the documentation provided with each bot
+
+BEST PRACTICES
+==============
+
+For CoachBot:
+- Be honest and open in your responses
+- Come prepared with specific goals or challenges
+- Take notes during your session
+- Follow up on action items discussed
+
+For InterviewBot:
+- Practice regularly to build confidence
+- Use the feedback provided to improve
+- Try different question types
+- Record your sessions for review
+
+For FAQ Bot:
+- Provide comprehensive and well-organized knowledge content
+- Update your knowledge base regularly
+- Use clear headings and structure
+- Include specific examples and use cases
+
+ADMIN KNOWLEDGE BASE MANAGEMENT
+===============================
+
+How do I edit the FAQ knowledge base?
+As an administrator, edit the file `data/faq-knowledge.txt` directly using any text editor. After making changes, restart the application for the updates to take effect.
+
+What format should I use for content?
+Use the following structure:
+- Main sections: SECTION NAME with equals signs (=====)
+- Subsections: Subsection Name with dashes (-----)
+- Questions followed by detailed answers
+- Bullet points for lists
+- Clear, concise language
+
+How often should I update the content?
+Update the knowledge base whenever:
+- New features are added to the platform
+- Policies or procedures change
+- Users frequently ask questions not covered
+- Feedback indicates information is unclear
+
+This knowledge base can be updated and customized to fit your specific needs and use cases. 
