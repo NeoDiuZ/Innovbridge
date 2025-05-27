@@ -1,16 +1,35 @@
-INNOVBRIDGE FAQ KNOWLEDGE BASE
+INNOVBRIDGE ASIA - FAQ KNOWLEDGE BASE
 
-ABOUT INNOVBRIDGE
-=================
+ABOUT INNOVBRIDGE ASIA
+========================
 
-What is InnovBridge?
-InnovBridge is an AI-powered platform that provides intelligent assistants to help users achieve their goals. We offer specialized bots for coaching, interview preparation, and answering questions through our FAQ system.
+What is InnovBridge Asia?
+InnovBridge Asia (innovbridgeasia.com) is a business consultancy specializing in innovation, research, and cutting-edge market strategies, including GenAI solutions. Our mission is to empower both global and local MNCs and SMEs to overcome obstacles and thrive. We aim to bridge the gap between ideas and execution, helping companies navigate complexity, seize opportunities, and achieve growth.
 
-Who can use InnovBridge?
-InnovBridge is designed for anyone looking to improve their skills, prepare for interviews, or get instant answers to their questions. Our platform is suitable for students, professionals, job seekers, and anyone interested in personal development.
+Who is InnovBridge Asia for?
+InnovBridge Asia serves businesses of all sizes (MNCs and SMEs) that are looking to innovate, implement GenAI solutions, or need expert consultancy to navigate market complexities and achieve their strategic goals.
 
-AVAILABLE BOTS
-==============
+What is the company's background?
+InnovBridge Asia was founded in 2024 by a seasoned professional with a PhD in AI and robotics. It operates in the Technology, Information, and Internet industry.
+
+What are InnovBridge Asia's core services?
+- Business Consultancy
+- Innovation Strategy
+- Market Research
+- GenAI Solutions and Implementation
+- Helping companies bridge ideas and execution
+
+INNOVBRIDGE ASIA PLATFORM (InnovBridge Bots - this project)
+==========================================================
+
+What is the InnovBridge Bots platform?
+This platform (the one you are currently interacting with) is an offering from InnovBridge Asia. It provides AI-powered assistants (bots) to help users achieve specific goals. The current bots are CoachBot, InterviewBot, and this FAQ Bot.
+
+How does this platform relate to InnovBridge Asia's consultancy services?
+This platform is a product/service offered by InnovBridge Asia, demonstrating our expertise in AI and our commitment to providing tools that help individuals and businesses. The bots themselves can be seen as examples of GenAI solutions in action.
+
+AVAILABLE BOTS ON THIS PLATFORM
+================================
 
 CoachBot
 --------
@@ -32,79 +51,56 @@ InterviewBot helps users prepare for job interviews by:
 
 FAQ Bot
 -------
-The FAQ Bot provides instant answers to questions using a customizable knowledge base. It can:
-- Answer questions based on uploaded content
-- Provide information about products, services, or policies
-- Help with documentation and support queries
-- Offer 24/7 assistance based on your knowledge base
+This FAQ Bot provides instant answers to questions using this knowledge base. It can:
+- Answer questions about InnovBridge Asia and its bot platform
+- Provide information about products, services, or policies (as defined here)
+- Help with documentation and support queries (related to the content herein)
 
-TECHNICAL FEATURES
-==================
+COMMUNITY AND CHALLENGES (Mentioned on innovbridgeasia.com)
+=========================================================
 
-How does the platform work?
-Our platform uses advanced AI technology (GPT-4) to provide intelligent, context-aware responses. Each bot is specifically trained for its purpose and maintains conversation history for better interaction.
+What are the challenges mentioned (Get a job, Develop your Portfolio, Create an audience)?
+Innovbridgeasia.com mentions challenges such as "Get a job challenge," "Develop your Portfolio," and "Create an audience." These appear to be programs or initiatives offered by InnovBridge Asia, possibly to help individuals with career development and skill-building. More specific details about these challenges would likely be found on the main InnovBridge Asia website or through their direct contact channels.
 
-Is my data secure?
-Yes, we prioritize data security. Conversations are stored temporarily for the session and are not used to train models or shared with third parties.
+Does InnovBridge Asia have a blog?
+Yes, innovbridgeasia.com features a blog with articles on topics such as Singapore's success and career development in Singapore. Some articles are in Burmese.
 
-Can I customize the bots?
-Currently, the FAQ Bot allows you to upload your own knowledge base content. Future updates may include more customization options for other bots.
+TECHNICAL FEATURES (This Platform)
+==================================
 
-GETTING STARTED
-===============
+How does this bot platform work?
+This platform uses advanced AI technology (specifically GPT models like GPT-4) to provide intelligent, context-aware responses. Each bot is specifically prompted for its purpose and maintains conversation history for better interaction within a session.
 
-How do I start using InnovBridge?
-1. Visit the main page and choose your preferred bot
-2. For CoachBot: Complete the questionnaire to personalize your coaching session
-3. For InterviewBot: Fill out your interview details and preferences
-4. For FAQ Bot: Upload your knowledge base content and start asking questions
+Is my data secure on this platform?
+Yes, we prioritize data security. Conversations with the bots on this platform are typically stored temporarily for the session to maintain context and are not used to train the underlying AI models or shared with unrelated third parties, as per standard OpenAI usage policies.
 
-What if I need help?
-If you need assistance with the platform, you can:
-- Use the FAQ Bot to search this knowledge base
-- Contact our support team
-- Refer to the documentation provided with each bot
+Can I customize these bots?
+Currently, this FAQ Bot's responses are determined by the content of this knowledge base file, which is managed by InnovBridge Asia administrators. Customization of the bots for specific enterprise needs could be a consultancy service offered by InnovBridge Asia.
 
-BEST PRACTICES
-==============
+GETTING STARTED (With This Platform)
+====================================
 
-For CoachBot:
-- Be honest and open in your responses
-- Come prepared with specific goals or challenges
-- Take notes during your session
-- Follow up on action items discussed
+How do I start using the bots on this platform?
+1. Visit the main page and choose your preferred bot (CoachBot, InterviewBot, FAQ Bot).
+2. For CoachBot: You might be asked to complete a questionnaire to personalize your coaching session (depending on current implementation).
+3. For InterviewBot: You might fill out details about your interview preferences (depending on current implementation).
+4. For this FAQ Bot: Simply start asking questions!
 
-For InterviewBot:
-- Practice regularly to build confidence
-- Use the feedback provided to improve
-- Try different question types
-- Record your sessions for review
+What if I need help with InnovBridge Asia's services or this platform?
+- For questions about this platform or the bots: You can ask this FAQ Bot!
+- For broader inquiries about InnovBridge Asia's consultancy, GenAI solutions, or specific challenges: It's best to refer to the main website (innovbridgeasia.com) or contact them through the channels provided there.
 
-For FAQ Bot:
-- Provide comprehensive and well-organized knowledge content
-- Update your knowledge base regularly
-- Use clear headings and structure
-- Include specific examples and use cases
+ADMIN KNOWLEDGE BASE MANAGEMENT (For this FAQ Bot)
+==================================================
 
-ADMIN KNOWLEDGE BASE MANAGEMENT
-===============================
+How is this FAQ knowledge base managed?
+This knowledge base (`data/faq-knowledge.txt`) is managed by InnovBridge Asia administrators. They directly edit this file to ensure the information is accurate and up-to-date. Users of this platform cannot directly edit this knowledge base.
 
-How do I edit the FAQ knowledge base?
-As an administrator, edit the file `data/faq-knowledge.txt` directly using any text editor. After making changes, restart the application for the updates to take effect.
-
-What format should I use for content?
-Use the following structure:
+What format is used for this content?
 - Main sections: SECTION NAME with equals signs (=====)
 - Subsections: Subsection Name with dashes (-----)
 - Questions followed by detailed answers
 - Bullet points for lists
 - Clear, concise language
 
-How often should I update the content?
-Update the knowledge base whenever:
-- New features are added to the platform
-- Policies or procedures change
-- Users frequently ask questions not covered
-- Feedback indicates information is unclear
-
-This knowledge base can be updated and customized to fit your specific needs and use cases. 
+This knowledge base is updated by InnovBridge Asia to provide relevant information about its services and this bot platform. 
