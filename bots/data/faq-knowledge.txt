@@ -1,106 +1,138 @@
-INNOVBRIDGE ASIA - FAQ KNOWLEDGE BASE
+---
 
-ABOUT INNOVBRIDGE ASIA
-========================
+### **What is Innovbridge?**
 
-What is InnovBridge Asia?
-InnovBridge Asia (innovbridgeasia.com) is a business consultancy specializing in innovation, research, and cutting-edge market strategies, including GenAI solutions. Our mission is to empower both global and local MNCs and SMEs to overcome obstacles and thrive. We aim to bridge the gap between ideas and execution, helping companies navigate complexity, seize opportunities, and achieve growth.
+Innovbridge is a Singapore-based platform dedicated to empowering the Burmese community through free digital tools. These include AI-powered bots, daily self-growth challenges, and practical learning systems. Innovbridge helps users build confidence, English fluency, and job readiness through culturally relevant, accessible experiences.
 
-Who is InnovBridge Asia for?
-InnovBridge Asia serves businesses of all sizes (MNCs and SMEs) that are looking to innovate, implement GenAI solutions, or need expert consultancy to navigate market complexities and achieve their strategic goals.
+---
 
-What is the company's background?
-InnovBridge Asia was founded in 2024 by a seasoned professional with a PhD in AI and robotics. It operates in the Technology, Information, and Internet industry.
+### **How does Innovbridge support the Burmese community?**
 
-What are InnovBridge Asia's core services?
-- Business Consultancy
-- Innovation Strategy
-- Market Research
-- GenAI Solutions and Implementation
-- Helping companies bridge ideas and execution
+Innovbridge is designed especially for Burmese youth and adults, particularly those living in Singapore. It offers simplified, culturally aware tools that help users improve their English, prepare for interviews, and grow personally and professionally — even if they’re shy, busy, or unsure where to start.
 
-INNOVBRIDGE ASIA PLATFORM (InnovBridge Bots - this project)
-==========================================================
+---
 
-What is the InnovBridge Bots platform?
-This platform (the one you are currently interacting with) is an offering from InnovBridge Asia. It provides AI-powered assistants (bots) to help users achieve specific goals. The current bots are CoachBot, InterviewBot, and this FAQ Bot.
+### **What is the Empowerment Challenge?**
 
-How does this platform relate to InnovBridge Asia's consultancy services?
-This platform is a product/service offered by InnovBridge Asia, demonstrating our expertise in AI and our commitment to providing tools that help individuals and businesses. The bots themselves can be seen as examples of GenAI solutions in action.
+The Empowerment Challenge is a structured personal development journey. It features daily tasks and weekly milestones to help users improve in areas like confidence, English speaking, and self-reflection. Participants earn points, build streaks, and unlock new tasks as they progress.
 
-AVAILABLE BOTS ON THIS PLATFORM
-================================
+---
 
-CoachBot
---------
-CoachBot is your personal AI coach that follows International Coaching Federation (ICF) guidelines. It helps users:
-- Set and achieve personal goals
-- Develop action plans
-- Build self-awareness
-- Create accountability structures
-- Navigate life and career challenges
+### **What is the 7-Day English Speaking Challenge?**
 
-InterviewBot
------------
-InterviewBot helps users prepare for job interviews by:
-- Conducting mock interviews
-- Providing feedback on answers
-- Offering practice questions for different roles
-- Supporting various interview types (behavioral, technical, system design)
-- Helping users improve their interview skills
+The 7-Day English Speaking Challenge is a focused program that builds spoken English skills through daily check-ins and check-outs. Users practice responding to prompts, track their streak, and form strong speaking habits day by day.
 
-FAQ Bot
--------
-This FAQ Bot provides instant answers to questions using this knowledge base. It can:
-- Answer questions about InnovBridge Asia and its bot platform
-- Provide information about products, services, or policies (as defined here)
-- Help with documentation and support queries (related to the content herein)
+---
 
-COMMUNITY AND CHALLENGES (Mentioned on innovbridgeasia.com)
-=========================================================
+### **How do I sign up on the Innovbridge website?**
 
-What are the challenges mentioned (Get a job, Develop your Portfolio, Create an audience)?
-Innovbridgeasia.com mentions challenges such as "Get a job challenge," "Develop your Portfolio," and "Create an audience." These appear to be programs or initiatives offered by InnovBridge Asia, possibly to help individuals with career development and skill-building. More specific details about these challenges would likely be found on the main InnovBridge Asia website or through their direct contact channels.
+1. Visit [innovbridgeasia.com](https://innovbridgeasia.com)
+2. Click **Login / Sign Up**
+3. Enter your name, email, and password
+4. After registering, you'll be redirected to your **Challenge Dashboard**
 
-Does InnovBridge Asia have a blog?
-Yes, innovbridgeasia.com features a blog with articles on topics such as Singapore's success and career development in Singapore. Some articles are in Burmese.
+---
 
-TECHNICAL FEATURES (This Platform)
-==================================
+### **What should I do after logging in?**
 
-How does this bot platform work?
-This platform uses advanced AI technology (specifically GPT models like GPT-4) to provide intelligent, context-aware responses. Each bot is specifically prompted for its purpose and maintains conversation history for better interaction within a session.
+Once logged in, you will land on the **Challenges Home** screen. From here, you can:
 
-Is my data secure on this platform?
-Yes, we prioritize data security. Conversations with the bots on this platform are typically stored temporarily for the session to maintain context and are not used to train the underlying AI models or shared with unrelated third parties, as per standard OpenAI usage policies.
+* View your current challenges
+* Click **Explore Challenges** to join new ones
+* Track your streak and points
+* Click **Continue** to work on your ongoing challenge
 
-Can I customize these bots?
-Currently, this FAQ Bot's responses are determined by the content of this knowledge base file, which is managed by InnovBridge Asia administrators. Customization of the bots for specific enterprise needs could be a consultancy service offered by InnovBridge Asia.
+---
 
-GETTING STARTED (With This Platform)
-====================================
+### **How do I join a challenge?**
 
-How do I start using the bots on this platform?
-1. Visit the main page and choose your preferred bot (CoachBot, InterviewBot, FAQ Bot).
-2. For CoachBot: You might be asked to complete a questionnaire to personalize your coaching session (depending on current implementation).
-3. For InterviewBot: You might fill out details about your interview preferences (depending on current implementation).
-4. For this FAQ Bot: Simply start asking questions!
+1. Click **Explore Challenges**
+2. Browse the available options
+3. Select a challenge and click **Join**
+4. The challenge will now appear under **Current Challenges** on your dashboard
 
-What if I need help with InnovBridge Asia's services or this platform?
-- For questions about this platform or the bots: You can ask this FAQ Bot!
-- For broader inquiries about InnovBridge Asia's consultancy, GenAI solutions, or specific challenges: It's best to refer to the main website (innovbridgeasia.com) or contact them through the channels provided there.
+---
 
-ADMIN KNOWLEDGE BASE MANAGEMENT (For this FAQ Bot)
-==================================================
+### **How do the daily tasks work?**
 
-How is this FAQ knowledge base managed?
-This knowledge base (`data/faq-knowledge.txt`) is managed by InnovBridge Asia administrators. They directly edit this file to ensure the information is accurate and up-to-date. Users of this platform cannot directly edit this knowledge base.
+Each day includes two steps:
 
-What format is used for this content?
-- Main sections: SECTION NAME with equals signs (=====)
-- Subsections: Subsection Name with dashes (-----)
-- Questions followed by detailed answers
-- Bullet points for lists
-- Clear, concise language
+* **Check-In**: Share your plan or thoughts after reading the prompt
+* **Check-Out**: Reflect on the day and submit your final answers
 
-This knowledge base is updated by InnovBridge Asia to provide relevant information about its services and this bot platform. 
+You must complete the Check-In before the Check-Out becomes available.
+
+---
+
+### **Can I skip days or do multiple tasks at once?**
+
+No. Challenges follow a strict daily progression. You must complete today’s task before the next one unlocks. Skipping is not allowed to ensure long-term habit building.
+
+---
+
+### **What are Weekly Milestones and Sub-Milestones?**
+
+Weekly Milestones are major goals for each week. Each one includes Sub-Milestones — smaller, trackable actions you can mark off during Check-Out. These help you measure real progress throughout the challenge.
+
+---
+
+### **How does the streak system work?**
+
+Each time you complete both the check-in and check-out on a day, your streak increases.
+
+* Skipping a full day resets your streak
+* Your streak is shown on the dashboard (e.g., 🔥 5-day streak!)
+  This motivates consistency and daily engagement.
+
+---
+
+### **Are there rewards or incentives?**
+
+Points are awarded for every completed task. While redeemable rewards are not yet available, a new incentive system is coming soon. This may include digital badges, coaching sessions, and other recognition for your effort.
+
+---
+
+### **What bots are available on Innovbridge?**
+
+* **Coach Bot**: Offers reflective, growth-focused conversations aligned with ICF standards
+* **Interview Bot**: Simulates real interview questions to help you practice
+* **FAQ Bot**: Answers common questions about how Innovbridge works
+
+You can access all bots from the **Bots** section on the homepage or top menu.
+
+---
+
+### **How do I use the Coach or Interview Bots?**
+
+1. Log in at [innovbridgeasia.com](https://innovbridgeasia.com)
+2. Click on the **Bots** tab in the menu
+3. Select **Coach Bot** or **Interview Bot**
+4. Start chatting — no setup needed
+
+All sessions are private, and your answers can be saved for review.
+
+---
+
+### **Is Innovbridge really free?**
+
+Yes! Innovbridge is completely free to use. There are no hidden charges. Simply sign up with your email to start using the bots and joining challenges. The platform is built to empower — not monetize — the Burmese community.
+
+---
+
+### **Can I use Innovbridge on my phone?**
+
+Yes. The Innovbridge website is mobile-friendly. You can complete all challenges, use the bots, and track your progress from your smartphone browser without needing to install an app.
+
+---
+
+### **Do I need to finish all tasks every day?**
+
+You’re encouraged to complete both the check-in and check-out to keep your streak going and earn full points. If you only complete one part, the day is not marked complete and won’t progress.
+
+---
+
+### **Who is Innovbridge built for?**
+
+Innovbridge is ideal for Burmese learners in Singapore and beyond who want to improve their English, prepare for job opportunities, or build life skills — all at their own pace. Whether you’re shy, busy, or just getting started, Innovbridge is made for you.
+
+---
