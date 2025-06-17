@@ -136,3 +136,50 @@ You’re encouraged to complete both the check-in and check-out to keep your str
 Innovbridge is ideal for Burmese learners in Singapore and beyond who want to improve their English, prepare for job opportunities, or build life skills — all at their own pace. Whether you’re shy, busy, or just getting started, Innovbridge is made for you.
 
 ---
+
+How do I navigate the Innovbridge website?
+
+Once you log in at innovbridgeasia.com, you’ll be taken to the Challenge Dashboard. Here’s how to navigate:
+
+Challenge Dashboard: View your current challenges, streak, and points.
+
+Explore Challenges: Click to browse and join new challenges.
+
+Bots Section: Access Coach Bot, Interview Bot, and FAQ Bot from the top menu or homepage.
+
+Redeem (Coming Soon): View available rewards once the redemption system launches.
+
+Why can’t I see any current challenges?
+You probably haven’t joined one yet. To get started:
+
+Go to Explore Challenges
+
+Click on a challenge that interests you
+
+Hit Join — it will now show up in your dashboard
+
+Why are some Challenges locked?
+We release the challenges in batches, one after another so do keep track of our annoucements for when the challenges release. 
+
+Reload the page or try again after a few seconds
+
+I checked in yesterday, but my streak didn’t go up. Why?
+Your streak only increases after both Check-In and Check-Out are completed for the same day. If you forget to check out, that day won’t count.
+
+Can I return to a skipped day later?
+No. Innovbridge uses a strict progression system. If you miss a day entirely (no check-in or check-out), it’s considered skipped and cannot be redone. This is done so to encourage and train building a habit
+
+Why is there no challenge in my dashboard even after i accepted a challenge?
+
+Make sure you're on a mobile phone/view, as we've only developed the challenge system for mobile only. 
+
+If issues persist, log out and back in or open a new page and try again
+
+I’m stuck. Where can I get help?
+If you’re unsure what to do:
+
+Use this FAQ Bot anytime
+
+Visit the Bots tab and speak with the Coach Bot for motivation or Interview Bot for practice
+
+Reach out to Innovbridge support via email or through the contact form on the homepage
